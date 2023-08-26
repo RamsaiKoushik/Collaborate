@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "695391386207",
+    "project_id": "iiitb-services",
+    "storage_bucket": "iiitb-services.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695391386207:android:b97644af9244a5112239ea",
+        "android_client_info": {
+          "package_name": "com.example.collaborate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695391386207-kiffdmt2jkoruou2dpckop7nrp8kbjnm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoHedpKQzsnr9oR6P9D0NfzeHtNMbHjrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695391386207-kiffdmt2jkoruou2dpckop7nrp8kbjnm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
