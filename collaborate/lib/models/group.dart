@@ -1,14 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// await FirebaseFirestore.instance.collection('groups').add({
-//       'category': selectedCategory,
-//       'skills': skillsList,
-//       'isHidden': isHidden,
-//       'description': description,
-//       'profilePicUrl': profilePicUrl,
-//       'createdBy': user.uid,
-//     });
-
 class Group {
   final String groupId;
   final String groupName;
@@ -21,6 +12,7 @@ class Group {
   final DateTime dateCreated;
   final String profilePic;
   final List groupMembers;
+  final List domains;
 
   const Group(
       {required this.groupId,
@@ -33,24 +25,25 @@ class Group {
       required this.username,
       required this.dateCreated,
       required this.profilePic,
-      required this.groupMembers});
+      required this.groupMembers,
+      required this.domains});
 
   static Group fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
 
     return Group(
-      groupId: snapshot["groupId"],
-      description: snapshot["description"],
-      groupName: snapshot["groupName"],
-      category: snapshot["category"],
-      skillsList: snapshot["skillsList"],
-      isHidden: snapshot["isHidden"],
-      uid: snapshot["uid"],
-      username: snapshot["username"],
-      dateCreated: snapshot["dateCreated"],
-      profilePic: snapshot["profilePic"],
-      groupMembers: snapshot["groupMembers"],
-    );
+        groupId: snapshot["groupId"],
+        description: snapshot["description"],
+        groupName: snapshot["groupName"],
+        category: snapshot["category"],
+        skillsList: snapshot["skillsList"],
+        isHidden: snapshot["isHidden"],
+        uid: snapshot["uid"],
+        username: snapshot["username"],
+        dateCreated: snapshot["dateCreated"],
+        profilePic: snapshot["profilePic"],
+        groupMembers: snapshot["groupMembers"],
+        domains: snapshot["domains"]);
   }
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +57,7 @@ class Group {
         "username": username,
         "dateCreated": dateCreated,
         'profilePic': profilePic,
-        "groupMembers": groupMembers
+        "groupMembers": groupMembers,
+        "domains": domains
       };
 }

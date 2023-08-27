@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/screens/edit_user_profile.dart';
+import 'package:collaborate/screens/login_screen.dart';
 import 'package:collaborate/utils/color_utils.dart';
+import 'package:collaborate/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:collaborate/utils/utils.dart';
@@ -63,6 +66,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void signOut() async {
+    try {
+      print("entered signout");
+      await AuthMethods().signOut();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    } catch (err) {
+      showSnackBar(context, err.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -74,89 +92,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
           )
         : Scaffold(
             backgroundColor: collaborateAppBarBgColor,
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: height * 0.1),
-                // ListView(physics: const BouncingScrollPhysics(), children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.grey,
-                        backgroundImage: NetworkImage(
-                          userData['photoUrl'],
+            body: Container(
+              constraints: BoxConstraints(minHeight: height),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: height * 0.1),
+                  // ListView(physics: const BouncingScrollPhysics(), children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          backgroundImage: NetworkImage(
+                            userData['photoUrl'],
+                          ),
+                          radius: width * 0.18,
+                          child: FirebaseAuth.instance.currentUser!.uid ==
+                                  widget.uid
+                              ? GestureDetector(onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const EditUserProfile()),
+                                  );
+                                })
+                              : Container(),
                         ),
-                        radius: width * 0.18,
-                        child:
-                            FirebaseAuth.instance.currentUser!.uid == widget.uid
-                                ? GestureDetector(onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const EditUserProfile()),
-                                    );
-                                  })
-                                : Container(),
-                      ),
-                      FirebaseAuth.instance.currentUser!.uid == widget.uid
-                          ? Positioned(
-                              bottom: 2,
-                              right: 6,
-                              child: ClipOval(
-                                child: Container(
-                                  color: Colors.white,
-                                  padding: const EdgeInsets.all(4),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: blackColor,
-                                    size: 30,
-                                  ),
+                        if (FirebaseAuth.instance.currentUser!.uid ==
+                            widget.uid)
+                          Positioned(
+                            bottom: 2,
+                            right: 6,
+                            child: ClipOval(
+                              child: Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.all(4),
+                                child: const Icon(
+                                  Icons.edit,
+                                  color: blackColor,
+                                  size: 30,
                                 ),
                               ),
-                            )
-                          : Container(),
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: height * 0.02),
+
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(userData['username'],
+                        style: GoogleFonts.raleway(
+                          fontSize: width * 0.08,
+                          color: collaborateAppBarTextColor,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
+
+                  SizedBox(height: height * 0.01),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      buildButton(context, following.toString(), 'following'),
+                      SizedBox(
+                        height: height * 0.04,
+                        child: const VerticalDivider(
+                          color: collaborateAppBarTextColor,
+                        ),
+                      ),
+                      buildButton(context, followers.toString(), 'followers')
                     ],
                   ),
-                ),
-                SizedBox(height: height * 0.02),
 
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(userData['username'],
-                      style: GoogleFonts.raleway(
-                        fontSize: width * 0.08,
-                        color: collaborateAppBarTextColor,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
+                  SizedBox(height: height * 0.05),
+                  buildInfo('email', userData['email']),
+                  SizedBox(height: height * 0.05),
+                  buildInfo('rollNumber', userData['rollNumber']),
+                  SizedBox(height: height * 0.05),
+                  buildAbout('About', userData['about']),
 
-                SizedBox(height: height * 0.01),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    buildButton(context, following.toString(), 'following'),
-                    SizedBox(
-                      height: height * 0.04,
-                      child: const VerticalDivider(
-                        color: collaborateAppBarTextColor,
-                      ),
-                    ),
-                    buildButton(context, followers.toString(), 'followers')
-                  ],
-                ),
-
-                SizedBox(height: height * 0.05),
-                buildInfo('email', userData['email']),
-                SizedBox(height: height * 0.05),
-                buildInfo('rollNumber', userData['rollNumber']),
-                SizedBox(height: height * 0.05),
-                buildAbout('About', userData['about']),
-              ],
+                  if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: color2,
+                            shape: ContinuousRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30.0), // Adjust the radius as needed
+                            ),
+                          ),
+                          onPressed: signOut,
+                          child: Text(
+                            'Sign Out',
+                            style: GoogleFonts.raleway(
+                                color: color4,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          )),
+                    )
+                ],
+              ),
             ),
-            //   body: ListView(
+            //   body: ListView
             //     children: [
             //       Padding(
             //         padding: const EdgeInsets.all(16),
@@ -321,21 +363,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             //   ),
           );
   }
-
-  // Widget buildEditIcon(Color color){
-
-  // return ClipOval(
-  //   child: Container(
-  //       color: Colors.white,
-  //       padding: EdgeInsets.all(8),
-  //       child: const Icon(
-  //         Icons.edit,
-  //         color: Colors.white,
-  //         size: 20,
-  //       ),
-  //       ),
-  //     );
-  // }
 
   Icon getIconFromName(String iconName) {
     switch (iconName) {

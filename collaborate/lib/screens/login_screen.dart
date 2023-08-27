@@ -70,21 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: height * 0.25,
             ),
-            // Flexible(
-            //   flex: 2,
-            //   child: Container(),
-            // ),
             Text('Collaborate',
                 style: GoogleFonts.raleway(
                   fontSize: width * 0.14,
                   color: collaborateAppBarTextColor,
                   fontWeight: FontWeight.w500,
                 )),
-            // SvgPicture.asset(
-            //   'assets/ic_instagram.svg',
-            //   color: primaryColor,
-            //   height: 64,
-            // ),
             const SizedBox(
               height: 64,
             ),
@@ -113,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 30,
             ),
-
             TextField(
               controller: _passwordController,
               obscureText: true,
@@ -139,7 +129,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               keyboardType: TextInputType.visiblePassword,
             ),
-
             GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(

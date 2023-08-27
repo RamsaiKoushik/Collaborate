@@ -51,6 +51,9 @@ class _EditUserProfileState extends State<EditUserProfile> {
     if (updatedAbout != '' &&
         (updatedRollNumber.length == 10 || updatedRollNumber == 11)) {
       updateUser(updatedAbout, updatedRollNumber);
+    } else {
+      showSnackBar(context, 'invalid update');
+      return;
     }
     Navigator.pop(context);
   }

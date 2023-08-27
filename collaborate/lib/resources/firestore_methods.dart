@@ -19,11 +19,12 @@ class FireStoreMethods {
       String description,
       Uint8List file,
       String uid,
-      String username) async {
+      String username,
+      List domains) async {
     String res = "Error occured! Please Try again";
     try {
-      String photoUrl =
-          await StorageMethods().uploadImageToStorage('posts', file, true);
+      String photoUrl = await StorageMethods()
+          .uploadImageToStorage('posts', file, true, false, "");
       String groupId = const Uuid().v1();
 
       Group group = Group(
@@ -37,16 +38,81 @@ class FireStoreMethods {
           uid: uid,
           username: username,
           dateCreated: DateTime.now(),
-          groupMembers: [uid]);
+          groupMembers: [uid],
+          domains: domains);
 
       _firestore
           .collection('groups')
-          .doc('colaborate')
+          .doc('collaborate')
           .collection('groups')
-          .add(group.toJson());
+          .doc(groupId)
+          .set(group.toJson());
     } catch (err) {
       res = err.toString();
     }
     return res;
+  }
+
+  Future<void> deleteGroup(String groupId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc('collaborate')
+          .collection('groups')
+          .doc(groupId)
+          .delete();
+    } catch (e) {
+      print("Error deleting group: $e");
+    }
+  }
+
+  Future<Map<String, dynamic>?> getGroupDetails(String groupId) async {
+    final doc = await _firestore
+        .collection('groups')
+        .doc('collaborate')
+        .collection('groups')
+        .doc(groupId)
+        .get();
+
+    if (doc.exists) {
+      return doc.data() as Map<String, dynamic>;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateGroupDetails(
+      String groupId, Map<String, dynamic> newData) async {
+    await _firestore
+        .collection('groups')
+        .doc('collaborate')
+        .collection('groups')
+        .doc(groupId)
+        .update(newData);
+  }
+
+  Future<void> removeUserFromGroup(String groupId, String userId) async {
+    try {
+      // Remove user from group members
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc('collaborate')
+          .collection('groups')
+          .doc(groupId)
+          .update({
+        'groupMembers': FieldValue.arrayRemove([userId]),
+      });
+    } catch (e) {
+      print("Error removing user from group: $e");
+    }
+  }
+
+  Future<String> getUsernameForUserId(String userId) async {
+    var userSnap =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    var userData = userSnap.data()!;
+
+    return userData["username"];
   }
 }

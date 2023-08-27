@@ -60,7 +60,6 @@ class _SignupScreenState extends State<SignupScreen> {
         about: _aboutController.text,
         file: _image!,
         learnSkills: _learnSkills);
-    // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
         _isLoading = false;
@@ -92,18 +91,7 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void _showMultiSelect() async {
-    // a list of selectable items
-    // these items can be hard-coded or dynamically fetched from a database/API
-    final List<String> items = [
-      'Flutter',
-      'Node.js',
-      'React Native',
-      'Java',
-      'Docker',
-      'MySQL'
-    ];
-
+  void _showMultiSelect(items) async {
     final List<String>? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -307,7 +295,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       // use this button to open the multi-select dialog
                       ElevatedButton(
-                          onPressed: _showMultiSelect,
+                          onPressed: () => {
+                                _showMultiSelect([
+                                  'Flutter',
+                                  'Node.js',
+                                  'React Native',
+                                  'Java',
+                                  'Docker',
+                                  'MySQL'
+                                ])
+                              },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white
                                 .withOpacity(0.3), // Set the background color

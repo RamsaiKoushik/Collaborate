@@ -47,8 +47,10 @@ class AuthMethods {
           password: password,
         );
 
+        cred.user!.updateDisplayName(username);
+
         String photoUrl = await StorageMethods()
-            .uploadImageToStorage('profilePics', file, false);
+            .uploadImageToStorage('profilePics', file, false, false, "");
 
         model.User user = model.User(
           username: username,

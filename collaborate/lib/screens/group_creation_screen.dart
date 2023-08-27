@@ -1,17 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/screens/multislect.dart';
 import 'package:collaborate/utils/color_utils.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth for user authentication
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../resources/storage_methods.dart';
-import '../utils/utils.dart'; // Import Firestore for database operations
+import '../utils/utils.dart';
 
 class GroupCreationScreen extends StatefulWidget {
   @override
@@ -25,6 +20,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
   String description = ''; // Store user input description
   String profilePicUrl = ''; // Store the selected profile pic URL
   Uint8List? _image;
+  List domains = [];
 
   TextEditingController skillController = TextEditingController();
 
@@ -55,6 +51,25 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
     });
   }
 
+  void _showMultiSelect(items) async {
+    // a list of selectable items
+    // these items can be hard-coded or dynamically fetched from a database/API
+
+    final List<String>? results = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MultiSelect(items: items);
+      },
+    );
+
+    // Update UI
+    if (results != null) {
+      setState(() {
+        domains = results;
+      });
+    }
+  }
+
   // Function to create the group and save details to Firestore
   void createGroup() async {
     _image ??= (await rootBundle.load('assets/defaultProfileIcon.png'))
@@ -70,17 +85,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
         selectedCategory != 'Select a Category' &&
         description.isNotEmpty) {
       FireStoreMethods().createGroup(groupName, selectedCategory, skillsList,
-          isHidden, description, _image!, user.uid, user.displayName!);
-      // Create a document in Firestore for the new group
-      // await FirebaseFirestore.instance.collection('groups').add({
-      //   'category': selectedCategory,
-      //   'skills': skillsList,
-      //   'isHidden': isHidden,
-      //   'description': description,
-      //   'profilePicUrl': profilePicUrl,
-      //   'createdBy': user.uid,
-      // });
-
+          isHidden, description, _image!, user.uid, user.displayName!, domains);
       // Navigate back to the home page
       Navigator.pop(context);
     }
@@ -107,7 +112,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
       body: Container(
         color: collaborateAppBarBgColor,
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Container(
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height,
@@ -115,6 +120,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: height * 0.06),
                 Align(
                   alignment: Alignment.center,
                   child: Stack(
@@ -168,7 +174,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
 
                 Container(
                   width: MediaQuery.of(context).size.width * 0.9,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   // decoration: BoxDecoration(
                   //   color: textFieldColor,
                   //   borderRadius: BorderRadius.circular(20),
@@ -210,7 +216,62 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                 ),
 
                 SizedBox(
-                  height: height * 0.06,
+                  height: height * 0.04,
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // use this button to open the multi-select dialog
+                        ElevatedButton(
+                            onPressed: () {
+                              _showMultiSelect([
+                                'Web Dev',
+                                'App Dev',
+                                'Machine Learning',
+                                'DevOps',
+                                'BlockCchain',
+                                'CyberSecurity'
+                              ]);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(width * 0.9, height * 0.05),
+                              backgroundColor: Colors.white
+                                  .withOpacity(0.3), // Set the background color
+                              foregroundColor:
+                                  Colors.white, // Set the text color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    30.0), // Set border radius
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10), // Set padding
+                              textStyle: GoogleFonts.raleway(color: color4),
+                            ),
+                            child: Text(
+                              'Choose the domains involved',
+                              style: GoogleFonts.raleway(
+                                  color: color4,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            )
+                            // const Text('Which areas would you like to explore'),
+                            ),
+
+                        Wrap(
+                          children: domains
+                              .map((e) => Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Chip(
+                                      label: Text(e),
+                                      backgroundColor: checkBoxColor,
+                                    ),
+                                  ))
+                              .toList(),
+                        )
+                      ]),
                 ),
 
                 // Skillset Input
@@ -299,7 +360,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                   ),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Submit and Cancel Buttons
                 Row(
@@ -324,7 +385,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                       child: Text('Submit',
                           style: GoogleFonts.raleway(
                               color: blackColor,
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.w500,
                               fontSize: 18)),
                     ),
                   ],
