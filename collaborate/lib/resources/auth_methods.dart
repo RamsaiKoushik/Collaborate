@@ -32,7 +32,7 @@ class AuthMethods {
     required String about,
     required String rollNumber,
     required Uint8List file,
-    required List<String> learnSkills,
+    required List learnSkills,
   }) async {
     String res = "Some error Occurred";
     try {

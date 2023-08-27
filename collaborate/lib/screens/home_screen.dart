@@ -369,10 +369,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showSecondDialog(BuildContext context, String option) async {
-    final List<String>? results = await showDialog(
+    final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return MultiSelect(items: items(option));
+        return MultiSelect(
+          items: items(option),
+          selectedItems: domainFilter,
+        );
       },
     );
 

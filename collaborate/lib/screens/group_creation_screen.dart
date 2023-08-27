@@ -19,6 +19,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
   bool isHidden = false; // Store the hide status
   String description = ''; // Store user input description
   String profilePicUrl = ''; // Store the selected profile pic URL
+  String groupName = '';
   Uint8List? _image;
   List domains = [];
 
@@ -30,10 +31,12 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
 
   // Function to add a skill to the skillsList
   void addSkill() {
-    setState(() {
-      skillsList.add(skillController.text);
-      skillController.clear();
-    });
+    if (skillController.text != '') {
+      setState(() {
+        skillsList.add(skillController.text);
+        skillController.clear();
+      });
+    }
   }
 
   // Function to remove a skill from the skillsList
@@ -55,10 +58,13 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
     // a list of selectable items
     // these items can be hard-coded or dynamically fetched from a database/API
 
-    final List<String>? results = await showDialog(
+    final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return MultiSelect(items: items);
+        return MultiSelect(
+          items: items,
+          selectedItems: const [],
+        );
       },
     );
 
@@ -160,7 +166,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        description = value;
+                        groupName = value;
                       });
                     },
                     maxLines: null,
@@ -237,18 +243,8 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                               ]);
                             },
                             style: ElevatedButton.styleFrom(
-                              fixedSize: Size(width * 0.9, height * 0.05),
-                              backgroundColor: Colors.white
-                                  .withOpacity(0.3), // Set the background color
-                              foregroundColor:
-                                  Colors.white, // Set the text color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    30.0), // Set border radius
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10), // Set padding
-                              textStyle: GoogleFonts.raleway(color: color4),
+                              backgroundColor: collaborateAppBarBgColor,
+                              elevation: 0,
                             ),
                             child: Text(
                               'Choose the domains involved',
@@ -299,6 +295,9 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                     for (int i = 0; i < skillsList.length; i++)
                       Row(
                         children: [
+                          SizedBox(
+                            width: width * 0.1,
+                          ),
                           Expanded(
                             child: Text(skillsList[i],
                                 style: GoogleFonts.raleway(
@@ -352,7 +351,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                       });
                     },
                     maxLines: null,
-                    maxLength: 200,
+                    maxLength: 500,
                     decoration: InputDecoration(
                         labelText: 'Description',
                         labelStyle:

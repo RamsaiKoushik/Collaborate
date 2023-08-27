@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/screens/login_screen.dart';
-import 'package:collaborate/utils/colors.dart';
 import 'package:collaborate/utils/utils.dart';
 import 'package:collaborate/utils/color_utils.dart';
 
@@ -27,8 +26,10 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isLoading = false;
   Uint8List? _image;
 
-  List<String> _learnSkills = [];
+  List _learnSkills = [];
+  // ignore: unused_field
   final List<String> _experienceSkills = [];
+  // ignore: unused_field
   final List<String> _playsports = [];
 
   @override
@@ -92,10 +93,13 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _showMultiSelect(items) async {
-    final List<String>? results = await showDialog(
+    final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return MultiSelect(items: items);
+        return MultiSelect(
+          items: items,
+          selectedItems: const [],
+        );
       },
     );
 
@@ -354,7 +358,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               fontWeight: FontWeight.bold, color: color4),
                         )
                       : const CircularProgressIndicator(
-                          color: primaryColor,
+                          color: Colors.blue,
                         ),
                 ),
               ),

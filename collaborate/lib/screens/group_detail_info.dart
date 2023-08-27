@@ -13,7 +13,7 @@ import '../utils/utils.dart';
 
 class GroupDetailScreen extends StatelessWidget {
   final String groupId;
-  String currentUserId = AuthMethods().getUserId();
+  final String currentUserId = AuthMethods().getUserId();
 
   GroupDetailScreen({super.key, required this.groupId});
 
@@ -106,11 +106,12 @@ class GroupDetailScreen extends StatelessWidget {
                   SizedBox(
                     height: height * 0.03,
                   ),
-                  Padding(
+                  Container(
+                    alignment: Alignment.center,
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(children: [
+                    child: Column(children: [
                       Text(
-                        'Created By: ',
+                        'Created By',
                         style: GoogleFonts.raleway(
                           fontSize: width * 0.05,
                           color: collaborateAppBarTextColor,
@@ -198,7 +199,7 @@ class GroupDetailScreen extends StatelessWidget {
                             return Chip(
                               label: Text(domain,
                                   style: GoogleFonts.raleway(
-                                      fontSize: width * 0.04,
+                                      fontSize: width * 0.035,
                                       color: collaborateAppBarBgColor,
                                       fontWeight: FontWeight.w400)),
                               backgroundColor: Colors.grey[300],
@@ -227,7 +228,7 @@ class GroupDetailScreen extends StatelessWidget {
                             return Chip(
                               label: Text(skill,
                                   style: GoogleFonts.raleway(
-                                      fontSize: width * 0.04,
+                                      fontSize: width * 0.035,
                                       color: collaborateAppBarBgColor,
                                       fontWeight: FontWeight.w400)),
                               backgroundColor: Colors.grey[300],
