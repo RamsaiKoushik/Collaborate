@@ -1,18 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/storage_methods.dart';
-import 'package:collaborate/screens/multislect.dart';
+import 'package:collaborate/widgets/member_selection.dart';
+import 'package:collaborate/widgets/multislect.dart';
 import 'package:flutter/material.dart';
 import 'package:collaborate/resources/firestore_methods.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../utils/utils.dart';
+import 'package:collaborate/utils/utils.dart';
 
 class GroupEditScreen extends StatefulWidget {
   final String groupId;
 
-  const GroupEditScreen({required this.groupId});
+  const GroupEditScreen({super.key, required this.groupId});
 
   @override
   _GroupEditScreenState createState() => _GroupEditScreenState();
@@ -140,7 +141,26 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: height * 0.06),
+                SizedBox(height: height * 0.05),
+                Center(
+                  child: GestureDetector(
+                    onTap: _showMemberSelectionDialog,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(200)),
+                        color: color2,
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Add members',
+                        style: GoogleFonts.raleway(
+                            color: color4,
+                            fontSize: width * 0.05,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
@@ -342,6 +362,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                             fontWeight: FontWeight.w500,
                             fontSize: 18),
                       ),
+                      SizedBox(height: height * 0.02),
                       for (int i = 0; i < groupMembers.length; i++)
                         Row(
                           children: [
@@ -369,16 +390,22 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                                 },
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => removeMember(i),
-                            ),
+                            if (groupMembers[i] != groupDetails!['uid'])
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => removeMember(i),
+                              ),
                             SizedBox(width: width * 0.1),
                           ],
                         ),
                     ],
                   ),
                 ),
+                SizedBox(
+                  height: height * 0.08,
+                ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -412,6 +439,46 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
         ),
       ),
     );
+  }
+
+  Future<Map<String, String>> _fetchUserNamesFromFirestore() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+
+    Map<String, String> userNames = {};
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String userId = doc.id;
+      String userName = doc['username'];
+
+      if (!groupMembers.contains(userId)) {
+        userNames[userId] = userName;
+      }
+    }
+    print(userNames);
+    print('entered the devil');
+
+    return userNames;
+  }
+
+  Future<void> _showMemberSelectionDialog() async {
+    Map<String, String> availableMembers = await _fetchUserNamesFromFirestore();
+
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MemberSelectionDialog(
+          availableMembers: availableMembers,
+          displayMembers: availableMembers,
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        groupMembers = groupMembers + result;
+      });
+    }
   }
 
   void addSkill() {

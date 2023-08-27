@@ -1,14 +1,16 @@
 import 'package:collaborate/resources/firestore_methods.dart';
-import 'package:collaborate/screens/multislect.dart';
+import 'package:collaborate/widgets/multislect.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import '../utils/utils.dart';
+import 'package:collaborate/utils/utils.dart';
 
 class GroupCreationScreen extends StatefulWidget {
+  const GroupCreationScreen({super.key});
+
   @override
   _GroupCreationScreenState createState() => _GroupCreationScreenState();
 }

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/screens/edit_user_profile.dart';
-import 'package:collaborate/screens/login_screen.dart';
+import 'package:collaborate/screens/user/edit_user_info.dart';
+import 'package:collaborate/screens/auth/login_screen.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,52 +17,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  var userData = {};
-  int postLen = 0;
-  int followers = 0;
-  int following = 0;
-  bool isFollowing = false;
-  bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
-    getData();
-  }
-
-  getData() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      var userSnap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.uid)
-          .get();
-
-      // get post lENGTH
-      var postSnap = await FirebaseFirestore.instance
-          .collection('posts')
-          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .get();
-
-      postLen = postSnap.docs.length;
-      userData = userSnap.data()!;
-      followers = userSnap.data()!['followers'].length;
-      following = userSnap.data()!['following'].length;
-      isFollowing = userSnap
-          .data()!['followers']
-          .contains(FirebaseAuth.instance.currentUser!.uid);
-      setState(() {});
-    } catch (e) {
-      showSnackBar(
-        context,
-        e.toString(),
-      );
-    }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   void signOut() async {
@@ -85,11 +42,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    return isLoading
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
-        : Scaffold(
+    return StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            // Data is loading, you can show a loading indicator
+            return const CircularProgressIndicator();
+          }
+
+          final user = snapshot.data!.data() as Map<String, dynamic>?;
+
+          if (user == null) {
+            // Group data is not available
+            // return showSnackBar(context, 'User not availalable');
+            return const CircularProgressIndicator();
+          }
+
+          return Scaffold(
             backgroundColor: collaborateAppBarBgColor,
             body: Container(
               constraints: BoxConstraints(minHeight: height),
@@ -105,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                           backgroundColor: Colors.grey,
                           backgroundImage: NetworkImage(
-                            userData['photoUrl'],
+                            user['profilePic'],
                           ),
                           radius: width * 0.18,
                           child: FirebaseAuth.instance.currentUser!.uid ==
@@ -143,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   Align(
                     alignment: Alignment.center,
-                    child: Text(userData['username'],
+                    child: Text(user['username'],
                         style: GoogleFonts.raleway(
                           fontSize: width * 0.08,
                           color: collaborateAppBarTextColor,
@@ -156,23 +128,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      buildButton(context, following.toString(), 'following'),
+                      buildButton(context, user['following'].length.toString(),
+                          'following'),
                       SizedBox(
                         height: height * 0.04,
                         child: const VerticalDivider(
                           color: collaborateAppBarTextColor,
                         ),
                       ),
-                      buildButton(context, followers.toString(), 'followers')
+                      buildButton(
+                          context, user['followers'].toString(), 'followers')
                     ],
                   ),
 
                   SizedBox(height: height * 0.05),
-                  buildInfo('email', userData['email']),
+                  buildInfo('email', user['email']),
                   SizedBox(height: height * 0.05),
-                  buildInfo('rollNumber', userData['rollNumber']),
+                  buildInfo('rollNumber', user['rollNumber']),
                   SizedBox(height: height * 0.05),
-                  buildAbout('About', userData['about']),
+                  buildAbout('About', user['about']),
 
                   const Spacer(),
 
@@ -203,6 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           );
+        });
   }
 
   Icon getIconFromName(String iconName) {

@@ -5,10 +5,33 @@ import 'package:collaborate/screens/group_tile.dart';
 
 import '../resources/auth_methods.dart'; // Import the GroupTile widget
 
-class GroupListingPage extends StatelessWidget {
+class GroupListingPage extends StatefulWidget {
   final FilterParameters filterParameters;
 
   const GroupListingPage({super.key, required this.filterParameters});
+
+  @override
+  State<GroupListingPage> createState() => _GroupListingPageState();
+}
+
+class _GroupListingPageState extends State<GroupListingPage> {
+  late FilterParameters _currentFilters;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentFilters = widget.filterParameters;
+  }
+
+  @override
+  void didUpdateWidget(covariant GroupListingPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_currentFilters != oldWidget.filterParameters) {
+      setState(() {
+        _currentFilters = widget.filterParameters;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,19 +53,19 @@ class GroupListingPage extends StatelessWidget {
           final groups = snapshot.data!.docs;
 
           final filteredGroups = groups.where((group) {
-            final categoryMatches = filterParameters.category.isEmpty ||
-                filterParameters.category.any((element) {
+            final categoryMatches = _currentFilters.category.isEmpty ||
+                _currentFilters.category.any((element) {
                   return (group['category'] == element);
                 });
-            final domainsMatch = filterParameters.domains.isEmpty ||
-                filterParameters.domains.every((domain) {
+            final domainsMatch = _currentFilters.domains.isEmpty ||
+                _currentFilters.domains.every((domain) {
                   return (group['domains'] as List).contains(domain);
                 });
-            final isMemberMatch = filterParameters.isMember == null ||
-                (filterParameters.isMember! &&
+            final isMemberMatch = _currentFilters.isMember == null ||
+                (_currentFilters.isMember! &&
                     group['groupMembers']
                         .contains(AuthMethods().getUserId())) ||
-                (!filterParameters.isMember! &&
+                (!_currentFilters.isMember! &&
                     !group['groupMembers'].contains(AuthMethods().getUserId()));
 
             return categoryMatches && domainsMatch && isMemberMatch;

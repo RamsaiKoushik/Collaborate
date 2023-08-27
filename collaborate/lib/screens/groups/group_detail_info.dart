@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/resources/firestore_methods.dart';
-import 'package:collaborate/screens/group_detail_edit.dart';
+import 'package:collaborate/screens/groups/group_detail_edit.dart';
 import 'package:collaborate/screens/home_screen.dart';
-import 'package:collaborate/screens/user_profile.dart';
+import 'package:collaborate/screens/user/user_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../utils/color_utils.dart';
-import '../utils/utils.dart';
+import 'package:collaborate/utils/color_utils.dart';
+import 'package:collaborate/utils/utils.dart';
 
 class GroupDetailScreen extends StatelessWidget {
   final String groupId;
@@ -310,7 +309,7 @@ class GroupDetailScreen extends StatelessWidget {
                               await FireStoreMethods().deleteGroup(groupId);
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                    builder: (context) => HomePage()),
+                                    builder: (context) => const HomePage()),
                               );
                             },
                             child: Text(
@@ -330,7 +329,7 @@ class GroupDetailScreen extends StatelessWidget {
                                   .removeUserFromGroup(groupId, currentUserId);
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                    builder: (context) => HomePage()),
+                                    builder: (context) => const HomePage()),
                               );
                             },
                             child: Text(

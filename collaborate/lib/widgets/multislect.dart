@@ -40,7 +40,7 @@ class _MultiSelectState extends State<MultiSelect> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Select Topics', style: TextStyle(color: color4)),
+      title: const Text('Select Domains', style: TextStyle(color: color4)),
       backgroundColor: collaborateAppBarBgColor,
       content: SingleChildScrollView(
         child: ListBody(

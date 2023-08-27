@@ -1,5 +1,3 @@
-// import 'package:collaborate/reusable_widgets/reusable_widget.dart';
-// import 'package:collaborate/screens/home_screen.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

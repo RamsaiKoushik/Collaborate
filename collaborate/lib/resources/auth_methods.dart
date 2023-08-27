@@ -25,15 +25,15 @@ class AuthMethods {
 
   // Signing Up User
 
-  Future<String> signUpUser({
-    required String email,
-    required String password,
-    required String username,
-    required String about,
-    required String rollNumber,
-    required Uint8List file,
-    required List learnSkills,
-  }) async {
+  Future<String> signUpUser(
+      {required String email,
+      required String password,
+      required String username,
+      required String about,
+      required String rollNumber,
+      required Uint8List file,
+      required List learnSkills,
+      required List experienceSkills}) async {
     String res = "Some error Occurred";
     try {
       if (email.isNotEmpty ||
@@ -49,20 +49,20 @@ class AuthMethods {
 
         cred.user!.updateDisplayName(username);
 
-        String photoUrl = await StorageMethods()
+        String profilePic = await StorageMethods()
             .uploadImageToStorage('profilePics', file, false, false, "");
 
         model.User user = model.User(
-          username: username,
-          uid: cred.user!.uid,
-          photoUrl: photoUrl,
-          email: email,
-          rollNumber: rollNumber,
-          about: about,
-          followers: [],
-          following: [],
-          learnSkills: learnSkills,
-        );
+            username: username,
+            uid: cred.user!.uid,
+            profilePic: profilePic,
+            email: email,
+            rollNumber: rollNumber,
+            about: about,
+            followers: [],
+            following: [],
+            learnSkills: learnSkills,
+            experienceSkills: experienceSkills);
 
         // adding user in our database
         await _firestore

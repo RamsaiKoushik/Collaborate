@@ -4,11 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/screens/login_screen.dart';
+import 'package:collaborate/screens/auth/login_screen.dart';
 import 'package:collaborate/utils/utils.dart';
 import 'package:collaborate/utils/color_utils.dart';
-
-import 'multislect.dart';
+import 'package:collaborate/widgets/multislect.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -27,10 +26,9 @@ class _SignupScreenState extends State<SignupScreen> {
   Uint8List? _image;
 
   List _learnSkills = [];
-  // ignore: unused_field
-  final List<String> _experienceSkills = [];
-  // ignore: unused_field
-  final List<String> _playsports = [];
+  List _selectedlearnSkills = [];
+  List _experienceSkills = [];
+  List _selectedExperienceSkills = [];
 
   @override
   void dispose() {
@@ -60,7 +58,8 @@ class _SignupScreenState extends State<SignupScreen> {
         rollNumber: _rollNumberController.text.trim(),
         about: _aboutController.text,
         file: _image!,
-        learnSkills: _learnSkills);
+        learnSkills: _learnSkills,
+        experienceSkills: _experienceSkills);
     if (res == "success") {
       setState(() {
         _isLoading = false;
@@ -69,7 +68,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (context.mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => HomePage(),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -92,13 +91,13 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void _showMultiSelect(items) async {
+  void _showMultiSelectLearn(items) async {
     final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return MultiSelect(
           items: items,
-          selectedItems: const [],
+          selectedItems: _selectedlearnSkills,
         );
       },
     );
@@ -107,6 +106,27 @@ class _SignupScreenState extends State<SignupScreen> {
     if (results != null) {
       setState(() {
         _learnSkills = results;
+        _selectedlearnSkills = _learnSkills;
+      });
+    }
+  }
+
+  void _showMultiSelectExperience(items) async {
+    final List? results = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MultiSelect(
+          items: items,
+          selectedItems: _selectedExperienceSkills,
+        );
+      },
+    );
+
+    // Update UI
+    if (results != null) {
+      setState(() {
+        _experienceSkills = results;
+        _selectedExperienceSkills = results;
       });
     }
   }
@@ -283,6 +303,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide:
                           const BorderSide(width: 0, style: BorderStyle.none)),
                 ),
+                maxLines: null,
+                maxLength: 500,
                 keyboardType: TextInputType.text,
               ),
               SizedBox(
@@ -300,13 +322,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       // use this button to open the multi-select dialog
                       ElevatedButton(
                           onPressed: () => {
-                                _showMultiSelect([
-                                  'Flutter',
-                                  'Node.js',
-                                  'React Native',
-                                  'Java',
-                                  'Docker',
-                                  'MySQL'
+                                _showMultiSelectLearn([
+                                  'Web Dev',
+                                  'App Dev',
+                                  'Machine Learning',
+                                  'DevOps',
+                                  'BlockChain',
+                                  'CyberSecurity'
                                 ])
                               },
                           style: ElevatedButton.styleFrom(
@@ -331,7 +353,57 @@ class _SignupScreenState extends State<SignupScreen> {
                                   padding: const EdgeInsets.all(4.0),
                                   child: Chip(
                                     label: Text(e),
-                                    backgroundColor: checkBoxColor,
+                                    backgroundColor: color3,
+                                  ),
+                                ))
+                            .toList(),
+                      )
+                    ]),
+              ),
+              Text(
+                'Which domains do you have experience?',
+                style: TextStyle(color: color4, fontSize: width * 0.06),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // use this button to open the multi-select dialog
+                      ElevatedButton(
+                          onPressed: () => {
+                                _showMultiSelectExperience([
+                                  'Web Dev',
+                                  'App Dev',
+                                  'Machine Learning',
+                                  'DevOps',
+                                  'BlockChain',
+                                  'CyberSecurity'
+                                ])
+                              },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white
+                                .withOpacity(0.3), // Set the background color
+                            foregroundColor: Colors.white, // Set the text color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30.0), // Set border radius
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10), // Set padding
+                            textStyle: const TextStyle(fontSize: 16),
+                          ),
+                          child: const Text('choose')
+                          // const Text('Which areas would you like to explore'),
+                          ),
+
+                      Wrap(
+                        children: _experienceSkills
+                            .map((e) => Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Chip(
+                                    label: Text(e),
+                                    backgroundColor: color3,
                                   ),
                                 ))
                             .toList(),

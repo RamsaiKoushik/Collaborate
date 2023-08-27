@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/resources/auth_methods.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:collaborate/models/post.dart';
 import 'package:collaborate/resources/storage_methods.dart';
@@ -67,15 +65,15 @@ class FireStoreMethods {
   }
 
   Future<Map<String, dynamic>?> getGroupDetails(String groupId) async {
-    final doc = await _firestore
+    final snapshot = await _firestore
         .collection('groups')
         .doc('collaborate')
         .collection('groups')
         .doc(groupId)
         .get();
 
-    if (doc.exists) {
-      return doc.data() as Map<String, dynamic>;
+    if (snapshot.exists) {
+      return snapshot.data() as Map<String, dynamic>;
     } else {
       return null;
     }
@@ -114,5 +112,21 @@ class FireStoreMethods {
     var userData = userSnap.data()!;
 
     return userData["username"];
+  }
+
+  Future<Map<String, dynamic>> getUserDetails(String userId) async {
+    // Replace 'users' with the actual Firestore collection name
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    if (snapshot.exists) {
+      return snapshot.data()!;
+    }
+    return {};
+  }
+
+  Future<void> updateUserDetails(
+      String userId, Map<String, dynamic> newData) async {
+    await _firestore.collection('users').doc(userId).update(newData);
   }
 }

@@ -3,25 +3,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class User {
   final String email;
   final String uid;
-  final String photoUrl;
+  final String profilePic;
   final String username;
   final String rollNumber;
   final String about;
   final List followers;
   final List following;
   final List learnSkills;
+  final List experienceSkills;
 
-  User({
-    required this.username,
-    required this.uid,
-    required this.photoUrl,
-    required this.email,
-    required this.rollNumber,
-    required this.about,
-    required this.followers,
-    required this.following,
-    required this.learnSkills,
-  });
+  User(
+      {required this.username,
+      required this.uid,
+      required this.profilePic,
+      required this.email,
+      required this.rollNumber,
+      required this.about,
+      required this.followers,
+      required this.following,
+      required this.learnSkills,
+      required this.experienceSkills});
 
   static User fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -31,11 +32,12 @@ class User {
         uid: snapshot["uid"],
         email: snapshot["email"],
         rollNumber: snapshot["rollNumber"],
-        photoUrl: snapshot["photoUrl"],
+        profilePic: snapshot["profilePic"],
         about: snapshot["about"],
         followers: snapshot["followers"],
         following: snapshot["following"],
-        learnSkills: snapshot["learnSkills"]);
+        learnSkills: snapshot["learnSkills"],
+        experienceSkills: snapshot['experienceSkills']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -43,10 +45,11 @@ class User {
         "uid": uid,
         "email": email,
         "rollNumber": rollNumber,
-        "photoUrl": photoUrl,
+        "profilePic": profilePic,
         "about": about,
         "followers": followers,
         "following": following,
-        "learnSkills": learnSkills
+        "learnSkills": learnSkills,
+        "experienceSkills": experienceSkills
       };
 }
