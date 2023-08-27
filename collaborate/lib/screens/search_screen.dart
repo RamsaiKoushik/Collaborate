@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/screens/group_tile.dart';
+import 'package:collaborate/widgets/group_tile.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,17 +1,17 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/screens/filter_parameters.dart';
-import 'package:collaborate/screens/group_creation_screen.dart';
-import 'package:collaborate/screens/group_list.dart';
+import 'package:collaborate/resources/filter_parameters.dart';
+import 'package:collaborate/screens/groups/group_creation_screen.dart';
+import 'package:collaborate/widgets/group_list.dart';
 import 'package:collaborate/screens/search_screen.dart';
-import 'package:collaborate/screens/user_info.dart';
+import 'package:collaborate/screens/user/user_info.dart';
 // import 'package:collaborate/screens/group_tile.dart';
 // import 'package:collaborate/screens/user_profile.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'multislect.dart';
+import '../widgets/multislect.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -149,7 +149,8 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const GroupCreationScreen()),
+                                builder: (context) =>
+                                    const GroupCreationScreen()),
                           );
                         },
                         child: const Icon(Icons.add),

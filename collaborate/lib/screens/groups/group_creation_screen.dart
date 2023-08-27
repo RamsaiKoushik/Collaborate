@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/widgets/member_selection.dart';
 import 'package:collaborate/widgets/multislect.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,8 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
   String groupName = '';
   Uint8List? _image;
   List domains = [];
+  List _selectedDomains = [];
+  List groupMembers = [AuthMethods().getUserId()];
 
   TextEditingController skillController = TextEditingController();
 
@@ -65,7 +70,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
       builder: (BuildContext context) {
         return MultiSelect(
           items: items,
-          selectedItems: const [],
+          selectedItems: _selectedDomains,
         );
       },
     );
@@ -74,6 +79,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
     if (results != null) {
       setState(() {
         domains = results;
+        _selectedDomains = domains;
       });
     }
   }
@@ -92,8 +98,17 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
         groupName.isNotEmpty &&
         selectedCategory != 'Select a Category' &&
         description.isNotEmpty) {
-      FireStoreMethods().createGroup(groupName, selectedCategory, skillsList,
-          isHidden, description, _image!, user.uid, user.displayName!, domains);
+      FireStoreMethods().createGroup(
+          groupName,
+          selectedCategory,
+          skillsList,
+          isHidden,
+          description,
+          _image!,
+          user.uid,
+          user.displayName!,
+          domains,
+          groupMembers);
       // Navigate back to the home page
       Navigator.pop(context);
     }
@@ -154,6 +169,27 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                         ),
                       )
                     ],
+                  ),
+                ),
+
+                SizedBox(height: height * 0.05),
+                Center(
+                  child: GestureDetector(
+                    onTap: _showMemberSelectionDialog,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(200)),
+                        color: color2,
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Add members',
+                        style: GoogleFonts.raleway(
+                            color: color4,
+                            fontSize: width * 0.05,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ),
 
@@ -240,7 +276,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                                 'App Dev',
                                 'Machine Learning',
                                 'DevOps',
-                                'BlockCchain',
+                                'BlockChain',
                                 'CyberSecurity'
                               ]);
                             },
@@ -263,8 +299,12 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                               .map((e) => Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: Chip(
-                                      label: Text(e),
-                                      backgroundColor: checkBoxColor,
+                                      label: Text(
+                                        e,
+                                        style:
+                                            GoogleFonts.raleway(color: color4),
+                                      ),
+                                      backgroundColor: color2,
                                     ),
                                   ))
                               .toList(),
@@ -294,26 +334,6 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                         ),
                       ],
                     ),
-                    for (int i = 0; i < skillsList.length; i++)
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: width * 0.1,
-                          ),
-                          Expanded(
-                            child: Text(skillsList[i],
-                                style: GoogleFonts.raleway(
-                                    color: color4,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400)),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: color4),
-                            onPressed: () => removeSkill(i),
-                          ),
-                          SizedBox(width: width * 0.1),
-                        ],
-                      ),
                   ],
                 ),
 
@@ -397,5 +417,48 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
         ),
       ),
     );
+  }
+
+  void removeMember(int index) {
+    setState(() {
+      groupMembers.removeAt(index);
+    });
+  }
+
+  Future<Map<String, String>> _fetchUserNamesFromFirestore() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+
+    Map<String, String> userNames = {};
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String userId = doc.id;
+      String userName = doc['username'];
+
+      if (!groupMembers.contains(userId)) {
+        userNames[userId] = userName;
+      }
+    }
+    return userNames;
+  }
+
+  Future<void> _showMemberSelectionDialog() async {
+    Map<String, String> availableMembers = await _fetchUserNamesFromFirestore();
+
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MemberSelectionDialog(
+          availableMembers: availableMembers,
+          displayMembers: availableMembers,
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        groupMembers = groupMembers + result;
+      });
+    }
   }
 }

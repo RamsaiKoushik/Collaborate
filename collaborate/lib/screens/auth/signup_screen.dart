@@ -150,7 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
               SizedBox(height: height * 0.1),
               Text('Collaborate',
                   style: GoogleFonts.raleway(
-                    fontSize: width * 0.14,
+                    fontSize: width * 0.12,
                     color: collaborateAppBarTextColor,
                     fontWeight: FontWeight.w500,
                   )),

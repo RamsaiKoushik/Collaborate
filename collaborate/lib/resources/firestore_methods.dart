@@ -18,7 +18,8 @@ class FireStoreMethods {
       Uint8List file,
       String uid,
       String username,
-      List domains) async {
+      List domains,
+      List groupMembers) async {
     String res = "Error occured! Please Try again";
     try {
       String photoUrl = await StorageMethods()
@@ -36,7 +37,7 @@ class FireStoreMethods {
           uid: uid,
           username: username,
           dateCreated: DateTime.now(),
-          groupMembers: [uid],
+          groupMembers: groupMembers,
           domains: domains);
 
       _firestore

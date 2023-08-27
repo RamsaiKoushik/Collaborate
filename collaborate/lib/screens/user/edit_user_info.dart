@@ -1,7 +1,7 @@
 import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/resources/firestore_methods.dart';
 import 'package:collaborate/resources/storage_methods.dart';
-import 'package:collaborate/screens/multislect.dart';
+import 'package:collaborate/widgets/multislect.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/utils/utils.dart';
 import 'package:flutter/material.dart';

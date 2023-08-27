@@ -1,9 +1,9 @@
 import 'package:collaborate/screens/home_screen.dart';
-import 'package:collaborate/screens/reset_password.dart';
+import 'package:collaborate/screens/auth/reset_password.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/screens/signup_screen.dart';
+import 'package:collaborate/screens/auth/signup_screen.dart';
 import 'package:collaborate/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Text('Collaborate',
                 style: GoogleFonts.raleway(
-                  fontSize: width * 0.14,
+                  fontSize: width * 0.12,
                   color: collaborateAppBarTextColor,
                   fontWeight: FontWeight.w500,
                 )),

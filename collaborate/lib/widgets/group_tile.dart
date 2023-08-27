@@ -3,7 +3,7 @@ import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'group_detail_info.dart';
+import '../screens/groups/group_detail_info.dart';
 
 class GroupTile extends StatelessWidget {
   final String groupId;

@@ -1,7 +1,7 @@
-import 'package:collaborate/screens/filter_parameters.dart';
+import 'package:collaborate/resources/filter_parameters.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/screens/group_tile.dart';
+import 'package:collaborate/widgets/group_tile.dart';
 
 import '../resources/auth_methods.dart'; // Import the GroupTile widget
 
