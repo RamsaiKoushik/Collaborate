@@ -5,49 +5,20 @@ import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+class SearchGroup extends StatefulWidget {
+  const SearchGroup({super.key});
 
   @override
-  _SearchPageState createState() => _SearchPageState();
+  _SearchGroupState createState() => _SearchGroupState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchGroupState extends State<SearchGroup> {
   final TextEditingController _searchController = TextEditingController();
-  late Stream<List<QueryDocumentSnapshot>> _filteredGroupsStream;
+  String searchTerm = "";
 
   @override
   void initState() {
     super.initState();
-    _filteredGroupsStream = FirebaseFirestore.instance
-        .collection('groups')
-        .doc('collaborate')
-        .collection('groups')
-        .snapshots()
-        .map((snapshot) => snapshot.docs);
-  }
-
-  void _performSearch(String searchTerm) {
-    if (searchTerm.isNotEmpty) {
-      setState(() {
-        _filteredGroupsStream = FirebaseFirestore.instance
-            .collection('groups')
-            .doc('collaborate')
-            .collection('groups')
-            .where('groupName', isGreaterThanOrEqualTo: searchTerm)
-            .snapshots()
-            .map((snapshot) => snapshot.docs);
-      });
-    } else {
-      setState(() {
-        _filteredGroupsStream = FirebaseFirestore.instance
-            .collection('groups')
-            .doc('collaborate')
-            .collection('groups')
-            .snapshots()
-            .map((snapshot) => snapshot.docs);
-      });
-    }
   }
 
   @override
@@ -92,13 +63,20 @@ class _SearchPageState extends State<SearchPage> {
                     // hintStyle: GoogleFonts.raleway(color: color4),
                     ),
                 onChanged: (value) {
-                  _performSearch(value);
+                  setState(() {
+                    searchTerm = value;
+                  });
                 },
               ),
             ),
             Expanded(
               child: StreamBuilder<List<QueryDocumentSnapshot>>(
-                stream: _filteredGroupsStream,
+                stream: FirebaseFirestore.instance
+                    .collection('groups')
+                    .doc('collaborate')
+                    .collection('groups')
+                    .snapshots()
+                    .map((snapshot) => snapshot.docs),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(
@@ -107,10 +85,24 @@ class _SearchPageState extends State<SearchPage> {
                   }
 
                   final groups = snapshot.data!;
+
+                  final filteredGroups = groups.where((group) {
+                    final searchMatches = group['category']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchTerm.toLowerCase()) ||
+                        group['groupName']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchTerm.toLowerCase());
+
+                    return searchMatches;
+                  }).toList();
+
                   return ListView.builder(
-                    itemCount: groups.length,
+                    itemCount: filteredGroups.length,
                     itemBuilder: (context, index) {
-                      final group = groups[index];
+                      final group = filteredGroups[index];
 
                       return Column(
                         children: [

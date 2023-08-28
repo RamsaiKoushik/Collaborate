@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/utils/color_utils.dart';
+import 'package:collaborate/widgets/send_join.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -161,6 +162,7 @@ class GroupTile extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
+                        applyToGroup(groupId, group['uid'], currentUserUid);
                         // Handle the apply/join action
                         // Send notification to group creator
                       },
@@ -200,4 +202,34 @@ class GroupTile extends StatelessWidget {
       ),
     );
   }
+
+  // Future<void> applyToGroup(
+  //     String groupId, String groupCid, String userId) async {
+  //   // Check if there's an existing notification with the same userId, groupId, and type
+  //   QuerySnapshot existingNotifications = await FirebaseFirestore.instance
+  //       .collection('notifications')
+  //       .where('type', isEqualTo: 'join_request')
+  //       .where('userId', isEqualTo: userId)
+  //       .where('groupId', isEqualTo: groupId)
+  //       .where('status', isEqualTo: 'pending')
+  //       .get();
+
+  //   // If an existing notification is found, update its timestamp
+  //   if (existingNotifications.docs.isNotEmpty) {
+  //     DocumentSnapshot existingNotification = existingNotifications.docs[0];
+  //     await existingNotification.reference.update({
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //     });
+  //   } else {
+  //     // Create a notification document in the 'notifications' collection
+  //     await FirebaseFirestore.instance.collection('notifications').add({
+  //       'userId': userId,
+  //       'groupId': groupId,
+  //       'group_cid': groupCid,
+  //       'status': 'pending',
+  //       'type': 'join_request',
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //     });
+  //   }
+  // }
 }

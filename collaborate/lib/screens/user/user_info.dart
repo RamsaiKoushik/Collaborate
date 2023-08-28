@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/screens/display_users.dart';
 import 'package:collaborate/screens/user/edit_user_info.dart';
 import 'package:collaborate/screens/auth/login_screen.dart';
 import 'package:collaborate/utils/color_utils.dart';
@@ -24,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void signOut() async {
     try {
-      print("entered signout");
+      // print("entered signout");
       await AuthMethods().signOut();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -49,15 +51,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            // Data is loading, you can show a loading indicator
             return const CircularProgressIndicator();
           }
 
           final user = snapshot.data!.data() as Map<String, dynamic>?;
 
           if (user == null) {
-            // Group data is not available
-            // return showSnackBar(context, 'User not availalable');
             return const CircularProgressIndicator();
           }
 
@@ -69,7 +68,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: height * 0.1),
-                  // ListView(physics: const BouncingScrollPhysics(), children: [
                   Align(
                     alignment: Alignment.center,
                     child: Stack(
@@ -112,7 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   SizedBox(height: height * 0.02),
-
                   Align(
                     alignment: Alignment.center,
                     child: Text(user['username'],
@@ -122,34 +119,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontWeight: FontWeight.bold,
                         )),
                   ),
-
                   SizedBox(height: height * 0.01),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      buildButton(context, user['following'].length.toString(),
-                          'following'),
+                      buildButton(context, user['following'], 'following',
+                          user['username']),
                       SizedBox(
                         height: height * 0.04,
                         child: const VerticalDivider(
                           color: collaborateAppBarTextColor,
                         ),
                       ),
-                      buildButton(
-                          context, user['followers'].toString(), 'followers')
+                      buildButton(context, user['followers'], 'followers',
+                          user['username'])
                     ],
                   ),
-
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  Column(
+                    children: [
+                      AuthMethods().getUserId() != widget.uid
+                          ? user['followers']
+                                  .whereType<String>()
+                                  .toList()
+                                  .contains(AuthMethods().getUserId())
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: color3,
+                                      ),
+                                      onPressed: () async {
+                                        await FireStoreMethods()
+                                            .unFollowRequest(widget.uid,
+                                                AuthMethods().getUserId());
+                                      },
+                                      child: Text('UnFollow',
+                                          style: GoogleFonts.raleway(
+                                              color: collaborateAppBarBgColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: width * 0.05))),
+                                )
+                              : Container(
+                                  alignment: Alignment.center,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: color3,
+                                      ),
+                                      onPressed: () async {
+                                        await FireStoreMethods().followRequest(
+                                            widget.uid,
+                                            AuthMethods().getUserId());
+                                      },
+                                      child: Text('Follow',
+                                          style: GoogleFonts.raleway(
+                                              color: collaborateAppBarBgColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: width * 0.05))),
+                                )
+                          : Container(),
+                    ],
+                  ),
                   SizedBox(height: height * 0.05),
                   buildInfo('email', user['email']),
                   SizedBox(height: height * 0.05),
                   buildInfo('rollNumber', user['rollNumber']),
                   SizedBox(height: height * 0.05),
                   buildAbout('About', user['about']),
-
                   const Spacer(),
-
                   if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -248,13 +287,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildButton(BuildContext context, String value, String text) {
+  Widget buildButton(
+      BuildContext context, List value, String text, String username) {
     return MaterialButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => UserListingPge(
+                  filter: value, title: text, userName: username)),
+        );
+      },
       child: Column(
         children: [
           Text(
-            value,
+            value.length.toString(),
             style: GoogleFonts.raleway(
               color: collaborateAppBarTextColor,
               fontWeight: FontWeight.w600,

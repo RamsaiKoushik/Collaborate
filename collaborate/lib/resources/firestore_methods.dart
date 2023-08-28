@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:collaborate/models/post.dart';
 import 'package:collaborate/resources/storage_methods.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/group.dart';
@@ -46,6 +47,11 @@ class FireStoreMethods {
           .collection('groups')
           .doc(groupId)
           .set(group.toJson());
+      print("inside create group");
+      print(groupId);
+
+      return groupId;
+      print("after return");
     } catch (err) {
       res = err.toString();
     }
@@ -61,7 +67,9 @@ class FireStoreMethods {
           .doc(groupId)
           .delete();
     } catch (e) {
-      print("Error deleting group: $e");
+      SnackBar(
+        content: Text(e.toString()),
+      );
     }
   }
 
@@ -78,6 +86,42 @@ class FireStoreMethods {
     } else {
       return null;
     }
+  }
+
+  // Function to accept a join request
+  Future<void> onAccept(
+      String notificationId, String groupId, String userId) async {
+    // Add the user to the group's members list
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc('collaborate')
+        .collection('groups')
+        .doc(groupId)
+        .update({
+      'groupMembers': FieldValue.arrayUnion([userId])
+    });
+
+    var group = await getGroupDetails(groupId);
+    print(group!['groupMembers']);
+
+    group['groupMembers'] = group['groupMembers'] + [userId];
+
+    await updateGroupDetails(groupId, group);
+
+    // Update the notification status to "accepted"
+    await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
+  }
+
+// Function to reject a join request
+  Future<void> onReject(String notificationId) async {
+    // Delete the notification document from the collection
+    await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
   }
 
   Future<void> updateGroupDetails(
@@ -102,7 +146,8 @@ class FireStoreMethods {
         'groupMembers': FieldValue.arrayRemove([userId]),
       });
     } catch (e) {
-      print("Error removing user from group: $e");
+      SnackBar(content: Text(e.toString()));
+      // print("Error removing user from group: $e");
     }
   }
 
@@ -129,5 +174,77 @@ class FireStoreMethods {
   Future<void> updateUserDetails(
       String userId, Map<String, dynamic> newData) async {
     await _firestore.collection('users').doc(userId).update(newData);
+  }
+
+  Future<void> followRequest(String uid, String followRequestId) async {
+    try {
+      Map<String, dynamic>? userDetails = await getUserDetails(uid);
+
+      List followersList = userDetails['followers'];
+
+      if (!followersList.contains(followRequestId)) {
+        await _firestore.collection('users').doc(uid).update({
+          'followers': FieldValue.arrayUnion([followRequestId])
+        });
+
+        await _firestore.collection('users').doc(followRequestId).update({
+          'following': FieldValue.arrayUnion([uid])
+        });
+      }
+    } catch (e) {
+      SnackBar(
+        content: Text(e.toString()),
+      );
+    }
+  }
+
+  Future<void> unFollowRequest(String uid, String unFollowRequestId) async {
+    try {
+      Map<String, dynamic>? userDetails = await getUserDetails(uid);
+
+      List followersList = userDetails['followers'];
+
+      if (followersList.contains(unFollowRequestId)) {
+        await _firestore.collection('users').doc(uid).update({
+          'followers': FieldValue.arrayRemove([unFollowRequestId])
+        });
+
+        await _firestore.collection('users').doc(unFollowRequestId).update({
+          'following': FieldValue.arrayRemove([uid])
+        });
+      }
+    } catch (e) {
+      SnackBar(
+        content: Text(e.toString()),
+      );
+    }
+  }
+
+  Future<void> followUser(String uid, String followId) async {
+    try {
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(uid).get();
+      List following = (snap.data()! as dynamic)['following'];
+
+      if (following.contains(followId)) {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayRemove([uid])
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayRemove([followId])
+        });
+      } else {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayUnion([uid])
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayUnion([followId])
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) print(e.toString());
+    }
   }
 }

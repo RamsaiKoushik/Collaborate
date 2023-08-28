@@ -40,7 +40,7 @@ class Group {
         isHidden: snapshot["isHidden"],
         uid: snapshot["uid"],
         username: snapshot["username"],
-        dateCreated: snapshot["dateCreated"],
+        dateCreated: snapshot["dateCreated"].toDate(),
         profilePic: snapshot["profilePic"],
         groupMembers: snapshot["groupMembers"],
         domains: snapshot["domains"]);

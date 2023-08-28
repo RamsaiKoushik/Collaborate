@@ -1,12 +1,13 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collaborate/models/user.dart';
 import 'package:collaborate/resources/auth_methods.dart';
 import 'package:collaborate/resources/filter_parameters.dart';
+import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/screens/display_users.dart';
 import 'package:collaborate/screens/groups/group_creation_screen.dart';
+import 'package:collaborate/screens/notifications.dart';
 import 'package:collaborate/widgets/group_list.dart';
-import 'package:collaborate/screens/search_screen.dart';
+import 'package:collaborate/screens/search_groups.dart';
 import 'package:collaborate/screens/user/user_info.dart';
-// import 'package:collaborate/screens/group_tile.dart';
-// import 'package:collaborate/screens/user_profile.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -74,7 +75,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const SearchPage(),
+                  builder: (context) => const SearchGroup(),
                 ),
               );
               // Handle search icon click
@@ -82,7 +83,17 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
             icon: const Icon(Icons.notifications),
-            onPressed: () {
+            onPressed: () async {
+              User user = await AuthMethods().getUserDetails();
+              List userSkills = user.experienceSkills + user.learnSkills;
+              List<String> userSkillinStrings =
+                  userSkills.map((item) => item.toString()).toList();
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NotificationsScreen(
+                  currentUserId: user.uid,
+                  currentUserDomains: userSkillinStrings,
+                ),
+              ));
               // showSearch(context: context, delegate: CustomDelegate());
               // Handle notification icon click
             },
@@ -179,40 +190,65 @@ class _HomePageState extends State<HomePage> {
                                     topRight: Radius.circular(25))),
                           ),
                           Positioned(
-                            left: width * 0.17,
-                            bottom: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                // _showSortDialog();
-                              },
-                              child: Container(
-                                // color: Colors.transparent,
-                                padding: const EdgeInsets.all(16),
-                                child: Icon(
-                                  Icons.sort,
-                                  color: color4,
-                                  size: height * 0.035,
+                            right: width * 0.17,
+                            bottom: 5,
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _showFirstDialog(context);
+                                  },
+                                  child: Container(
+                                    child: Icon(
+                                      Icons.filter_alt,
+                                      color: color4,
+                                      size: height * 0.035,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  'filter groups',
+                                  style: GoogleFonts.raleway(
+                                      color: color4,
+                                      fontSize: width * 0.04,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ),
                           Positioned(
-                            right: width * 0.17,
-                            bottom: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                _showFirstDialog(context);
-                                // _showMultiSelect([])
-                                // _showSortDialog();
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                child: Icon(
-                                  Icons.filter_alt,
-                                  color: color4,
-                                  size: height * 0.035,
+                            left: width * 0.17,
+                            bottom: 5,
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const UserListingPge(
+                                                  filter: [],
+                                                  title: 'search',
+                                                  userName: "",
+                                                )));
+                                    // _showSortDialog();
+                                  },
+                                  child: Container(
+                                    child: Icon(
+                                      Icons.search,
+                                      color: color4,
+                                      size: height * 0.035,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  'search users',
+                                  style: GoogleFonts.raleway(
+                                      color: color4,
+                                      fontSize: width * 0.04,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -271,6 +307,25 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.raleway(color: color4),
                 ),
               ),
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     textStyle: GoogleFonts.raleway(color: color4),
+              //     backgroundColor: color2,
+              //   ),
+              //   onPressed: () async {
+              //     var user = await FireStoreMethods()
+              //         .getUserDetails(AuthMethods().getUserId());
+              //     setState(() {
+              //       domainFilter = user['']
+              //     });
+              //     Navigator.pop(context);
+              //     // Close first dialog
+              //   },
+              //   child: Text(
+              //     'My Skills(explore)',
+              //     style: GoogleFonts.raleway(color: color4),
+              //   ),
+              // ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(
@@ -322,9 +377,9 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return MultiSelect(
-          items: items(option),
-          selectedItems: domainFilter,
-        );
+            items: items(option),
+            selectedItems:
+                option == 'Category' ? categoryFilter : domainFilter);
       },
     );
 

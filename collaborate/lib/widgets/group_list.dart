@@ -68,7 +68,14 @@ class _GroupListingPageState extends State<GroupListingPage> {
                 (!_currentFilters.isMember! &&
                     !group['groupMembers'].contains(AuthMethods().getUserId()));
 
-            return categoryMatches && domainsMatch && isMemberMatch;
+            final privateGroup = (_currentFilters.isMember != null &&
+                    _currentFilters.isMember!) ||
+                !group['isHidden'];
+
+            return categoryMatches &&
+                domainsMatch &&
+                isMemberMatch &&
+                privateGroup;
           }).toList();
 
           return ListView.builder(

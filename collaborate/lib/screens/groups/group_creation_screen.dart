@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collaborate/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 class GroupCreationScreen extends StatefulWidget {
   const GroupCreationScreen({super.key});
@@ -98,7 +99,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
         groupName.isNotEmpty &&
         selectedCategory != 'Select a Category' &&
         description.isNotEmpty) {
-      FireStoreMethods().createGroup(
+      String res = await FireStoreMethods().createGroup(
           groupName,
           selectedCategory,
           skillsList,
@@ -109,6 +110,19 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
           user.displayName!,
           domains,
           groupMembers);
+
+      print("groupId returned by create gorup");
+      print(res);
+      String notificationId = const Uuid().v1();
+      await FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(notificationId)
+          .set({
+        'notificationId': notificationId,
+        'groupId': res, // Get the current group ID
+        'type': 'recommendation',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
       // Navigate back to the home page
       Navigator.pop(context);
     }
@@ -334,6 +348,24 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                         ),
                       ],
                     ),
+                    for (int i = 0; i < skillsList.length; i++)
+                      Row(
+                        children: [
+                          SizedBox(width: width * 0.1),
+                          Expanded(
+                            child: Text(skillsList[i],
+                                style: GoogleFonts.raleway(
+                                    color: color4,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400)),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: color4),
+                            onPressed: () => removeSkill(i),
+                          ),
+                          SizedBox(width: width * 0.1),
+                        ],
+                      ),
                   ],
                 ),
 
