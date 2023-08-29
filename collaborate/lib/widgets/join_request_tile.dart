@@ -226,8 +226,10 @@ class JoinRequestTile extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(userDetails['profilePic']),
+                        backgroundImage: NetworkImage(
+                          userDetails['profilePic'],
+                        ),
+                        backgroundColor: collaborateAppBarBgColor,
                       ),
                       title: Row(
                         children: [

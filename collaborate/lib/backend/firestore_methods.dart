@@ -214,4 +214,37 @@ class FireStoreMethods {
       );
     }
   }
+
+  Future<bool> checkNotificationExistence(
+      String groupId, String currentUserUid, String groupCreatorId) async {
+    print("inside firestore");
+    print(groupId);
+    print(currentUserUid);
+    print(groupCreatorId);
+    // Perform the Firestore query to check if the notification exists
+    QuerySnapshot notificationSnapshot = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('groupId', isEqualTo: groupId)
+        .where('userId', isEqualTo: currentUserUid)
+        .where('group_cid', isEqualTo: groupCreatorId)
+        .get();
+
+    print(notificationSnapshot.size);
+
+    return notificationSnapshot.docs.isNotEmpty;
+  }
+
+  Future<List<QueryDocumentSnapshot>> fetchNotification(
+    String groupId,
+    String currentUserId,
+    String groupCreatorId,
+  ) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('groupId', isEqualTo: groupId)
+        .where('userId', isEqualTo: currentUserId)
+        .where('group_cid', isEqualTo: groupCreatorId)
+        .get();
+    return querySnapshot.docs;
+  }
 }

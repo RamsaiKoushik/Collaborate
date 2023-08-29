@@ -98,23 +98,30 @@ class NotificationsScreen extends StatelessWidget {
                   if (group == null) return Container();
 
                   if (type == 'recommendation') {
-                    FutureBuilder<Map<String, dynamic>?>(
+                    // print('inside not');
+                    return FutureBuilder<Map<String, dynamic>>(
                       future: FireStoreMethods().getUserDetails(group.uid),
                       builder: (context, userSnapshot) {
+                        // print('inside future');
                         if (userSnapshot.connectionState ==
                             ConnectionState.waiting) {
+                          // print('inside');
                           return const CircularProgressIndicator();
                         }
 
                         if (userSnapshot.hasError) {
                           return const Text('Error loading user data');
                         }
-
+                        // print('came inside');
                         Map<String, dynamic>? userData = userSnapshot.data;
+
+                        // if (userData != null) print(userData['followers']);
+
                         if (userData == null ||
                             !userData['followers'].contains(currentUserId)) {
                           return Container();
                         }
+
                         return RecommendedGroupTile(
                           group: group,
                         );

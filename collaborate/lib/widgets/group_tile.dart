@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/send_join.dart';
 import 'package:flutter/material.dart';
@@ -93,11 +94,13 @@ class GroupTile extends StatelessWidget {
                           runSpacing: 2, // Adjust the spacing between lines
                           children: domains.map<Widget>((domain) {
                             return Chip(
+                              // shape: OutlinedBorder(side: BorderSide()),
+                              // backgroundColor: color3,
                               label: Text(
                                 domain,
                                 style: GoogleFonts.raleway(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 14,
+                                  fontSize: width * 0.03,
                                 ),
                               ),
                             );
@@ -157,22 +160,48 @@ class GroupTile extends StatelessWidget {
                     SizedBox(
                       height: height * 0.03,
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: collaborateAppBarBgColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      onPressed: () {
-                        applyToGroup(groupId, group['uid'], currentUserUid);
-                        // Handle the apply/join action
-                        // Send notification to group creator
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('notifications')
+                          .where('groupId', isEqualTo: groupId)
+                          .where('userId', isEqualTo: currentUserUid)
+                          .where('group_cid', isEqualTo: group['uid'])
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+
+                        bool notificationExists =
+                            snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+
+                        if (notificationExists) {
+                          return Chip(
+                              label: Text('Requested',
+                                  style: GoogleFonts.raleway(
+                                      color: blackColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: width * 0.04)));
+                        } else {
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: collaborateAppBarBgColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            onPressed: () {
+                              applyToGroup(
+                                  groupId, group['uid'], currentUserUid);
+                            },
+                            child: Text(group["category"] == "Group Study"
+                                ? 'Join'
+                                : 'Apply'),
+                          );
+                        }
                       },
-                      child: Text(group["category"] == "Group Study"
-                          ? 'Join'
-                          : 'Apply'),
-                    ),
+                    )
                   ],
                 );
               } else {
@@ -205,34 +234,4 @@ class GroupTile extends StatelessWidget {
       ),
     );
   }
-
-  // Future<void> applyToGroup(
-  //     String groupId, String groupCid, String userId) async {
-  //   // Check if there's an existing notification with the same userId, groupId, and type
-  //   QuerySnapshot existingNotifications = await FirebaseFirestore.instance
-  //       .collection('notifications')
-  //       .where('type', isEqualTo: 'join_request')
-  //       .where('userId', isEqualTo: userId)
-  //       .where('groupId', isEqualTo: groupId)
-  //       .where('status', isEqualTo: 'pending')
-  //       .get();
-
-  //   // If an existing notification is found, update its timestamp
-  //   if (existingNotifications.docs.isNotEmpty) {
-  //     DocumentSnapshot existingNotification = existingNotifications.docs[0];
-  //     await existingNotification.reference.update({
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     });
-  //   } else {
-  //     // Create a notification document in the 'notifications' collection
-  //     await FirebaseFirestore.instance.collection('notifications').add({
-  //       'userId': userId,
-  //       'groupId': groupId,
-  //       'group_cid': groupCid,
-  //       'status': 'pending',
-  //       'type': 'join_request',
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     });
-  //   }
-  // }
 }
