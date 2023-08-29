@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/widgets/member_selection.dart';
 import 'package:collaborate/widgets/multislect.dart';
 import 'package:collaborate/utils/color_utils.dart';
@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:collaborate/utils/utils.dart';
+import 'package:collaborate/utils/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class GroupCreationScreen extends StatefulWidget {
@@ -222,7 +222,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                       });
                     },
                     maxLines: null,
-                    maxLength: 50,
+                    maxLength: 25,
                     decoration: InputDecoration(
                         labelText: 'Team Name',
                         labelStyle:
@@ -277,7 +277,8 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                   height: height * 0.04,
                 ),
 
-                Padding(
+                Container(
+                  alignment: Alignment.center,
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -299,7 +300,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                               elevation: 0,
                             ),
                             child: Text(
-                              'Choose the domains involved',
+                              'Tap to Choose the domains involved',
                               style: GoogleFonts.raleway(
                                   color: color4,
                                   fontSize: 18,
@@ -325,6 +326,8 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                         )
                       ]),
                 ),
+
+                SizedBox(height: height * 0.06),
 
                 // Skillset Input
                 Column(
@@ -413,7 +416,60 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Members of the team',
+                        style: GoogleFonts.raleway(
+                            color: color4,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18),
+                      ),
+                      SizedBox(height: height * 0.02),
+                      for (int i = 0; i < groupMembers.length; i++)
+                        Row(
+                          children: [
+                            SizedBox(width: width * 0.1),
+                            Expanded(
+                              child: FutureBuilder<String>(
+                                future: FireStoreMethods()
+                                    .getUsernameForUserId(groupMembers[i]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  } else if (snapshot.hasData) {
+                                    final username = snapshot.data!;
+                                    return Text(username,
+                                        style: GoogleFonts.raleway(
+                                            color: color4,
+                                            fontSize: width * 0.06,
+                                            fontWeight: FontWeight.bold));
+                                  } else {
+                                    return const Text('No data');
+                                  }
+                                },
+                              ),
+                            ),
+                            if (groupMembers[i] != AuthMethods().getUserId())
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => removeMember(i),
+                              ),
+                            SizedBox(width: width * 0.1),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: height * 0.08,
+                ),
 
                 // Submit and Cancel Buttons
                 Row(

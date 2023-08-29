@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
 import 'package:collaborate/screens/auth/login_screen.dart';
-import 'package:collaborate/utils/utils.dart';
+import 'package:collaborate/utils/image_picker.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/multislect.dart';
 
@@ -22,6 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
   final TextEditingController _rollNumberController = TextEditingController();
+  bool isObscured = true;
   bool _isLoading = false;
   Uint8List? _image;
 
@@ -78,7 +79,15 @@ class _SignupScreenState extends State<SignupScreen> {
       });
       // show the error
       if (context.mounted) {
-        showSnackBar(context, res);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: color2,
+            content: Text(
+              res,
+              style: GoogleFonts.raleway(fontSize: 18, color: color1),
+            ),
+          ),
+        );
       }
     }
   }
@@ -186,11 +195,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _usernameController,
                 autocorrect: true,
                 cursorColor: color4,
-                style: TextStyle(color: Colors.white.withOpacity(0.9)),
+                maxLength: 18,
+                style: const TextStyle(color: color4),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.person_2_outlined,
-                    color: Colors.white70,
+                    color: color4,
                   ),
                   labelText: 'Your username',
                   labelStyle: const TextStyle(color: color4),
@@ -211,11 +221,11 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _emailController,
                 autocorrect: true,
                 cursorColor: color4,
-                style: TextStyle(color: Colors.white.withOpacity(0.9)),
+                style: TextStyle(color: color4),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.email_outlined,
-                    color: Colors.white70,
+                    color: color4,
                   ),
                   labelText: 'Your email',
                   labelStyle: const TextStyle(color: color4),
@@ -234,15 +244,25 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: isObscured,
                 autocorrect: false,
                 cursorColor: color4,
                 style: const TextStyle(color: color4),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.lock_outline,
-                    color: Colors.white70,
+                    color: color4,
                   ),
+                  suffixIcon: IconButton(
+                      icon: Icon(
+                        isObscured ? Icons.visibility_off : Icons.visibility,
+                        color: color4,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isObscured = !isObscured;
+                        });
+                      }),
                   labelText: 'Your password',
                   labelStyle: const TextStyle(color: color4),
                   filled: true,
@@ -266,7 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.numbers_outlined,
-                    color: Colors.white70,
+                    color: color4,
                   ),
                   labelText: 'Roll Number',
                   labelStyle: const TextStyle(color: color4),
@@ -291,7 +311,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.person_2_outlined,
-                    color: Colors.white70,
+                    color: color4,
                   ),
                   labelText: 'about you',
                   labelStyle: const TextStyle(color: color4),

@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/resources/storage_methods.dart';
+import 'package:collaborate/backend/storage_methods.dart';
 import 'package:collaborate/widgets/member_selection.dart';
 import 'package:collaborate/widgets/multislect.dart';
 import 'package:flutter/material.dart';
-import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:collaborate/utils/utils.dart';
+import 'package:collaborate/utils/image_picker.dart';
 
 class GroupEditScreen extends StatefulWidget {
   final String groupId;
@@ -169,7 +169,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                       color: color4,
                     ),
                     maxLines: null,
-                    maxLength: 50,
+                    maxLength: 25,
                     decoration: InputDecoration(
                         labelText: 'Team Name',
                         labelStyle:

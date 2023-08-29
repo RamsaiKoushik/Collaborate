@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/screens/groups/group_detail_edit.dart';
 import 'package:collaborate/screens/home_screen.dart';
 import 'package:collaborate/screens/user/user_info.dart';
@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:collaborate/utils/color_utils.dart';
-import 'package:collaborate/utils/utils.dart';
 
 class GroupDetailScreen extends StatelessWidget {
   final String groupId;
@@ -39,7 +38,7 @@ class GroupDetailScreen extends StatelessWidget {
 
         if (group == null) {
           // Group data is not available
-          return showSnackBar(context, 'Group not available');
+          return Container();
         }
 
         return Scaffold(
@@ -135,8 +134,11 @@ class GroupDetailScreen extends StatelessWidget {
                       )
                     ]),
                   ),
+                  SizedBox(
+                    height: height * 0.03,
+                  ),
                   Container(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.symmetric(horizontal: width * 0.05),
                     alignment: Alignment.center,
                     child: Column(
                       children: [
@@ -179,64 +181,82 @@ class GroupDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        Text('Domains',
-                            style: GoogleFonts.raleway(
-                                fontSize: width * 0.06,
-                                color: color4,
-                                fontWeight: FontWeight.w400)),
-                        Wrap(
-                          spacing: 8, // Adjust the spacing between chips
-                          runSpacing: 4, // Adjust the spacing between lines
-                          children: group["domains"].map<Widget>((domain) {
-                            return Chip(
-                              label: Text(domain,
-                                  style: GoogleFonts.raleway(
-                                      fontSize: width * 0.035,
-                                      color: collaborateAppBarBgColor,
-                                      fontWeight: FontWeight.w400)),
-                              backgroundColor: Colors.grey[300],
-                            );
-                          }).toList(),
+                  group["domains"].length != 0
+                      ? Column(
+                          children: [
+                            SizedBox(
+                              height: height * 0.03,
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                children: [
+                                  Text('Domains',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: width * 0.06,
+                                          color: color4,
+                                          fontWeight: FontWeight.w400)),
+                                  Wrap(
+                                    spacing:
+                                        8, // Adjust the spacing between chips
+                                    runSpacing:
+                                        4, // Adjust the spacing between lines
+                                    children:
+                                        group["domains"].map<Widget>((domain) {
+                                      return Chip(
+                                        label: Text(domain,
+                                            style: GoogleFonts.raleway(
+                                                fontSize: width * 0.035,
+                                                color: collaborateAppBarBgColor,
+                                                fontWeight: FontWeight.w400)),
+                                        backgroundColor: Colors.grey[300],
+                                      );
+                                    }).toList(),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
                         )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        Text('Skillset',
-                            style: GoogleFonts.raleway(
-                                fontSize: width * 0.06,
-                                color: color4,
-                                fontWeight: FontWeight.w400)),
-                        Wrap(
-                          spacing: 8, // Adjust the spacing between chips
-                          runSpacing: 4, // Adjust the spacing between lines
-                          children: group["skillsList"].map<Widget>((skill) {
-                            return Chip(
-                              label: Text(skill,
-                                  style: GoogleFonts.raleway(
-                                      fontSize: width * 0.035,
-                                      color: collaborateAppBarBgColor,
-                                      fontWeight: FontWeight.w400)),
-                              backgroundColor: Colors.grey[300],
-                            );
-                          }).toList(),
+                      : Container(),
+                  group['skillsList'].length != 0
+                      ? Column(
+                          children: [
+                            SizedBox(
+                              height: height * 0.03,
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                children: [
+                                  Text('Skillset',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: width * 0.06,
+                                          color: color4,
+                                          fontWeight: FontWeight.w400)),
+                                  Wrap(
+                                    spacing:
+                                        8, // Adjust the spacing between chips
+                                    runSpacing:
+                                        4, // Adjust the spacing between lines
+                                    children: group["skillsList"]
+                                        .map<Widget>((skill) {
+                                      return Chip(
+                                        label: Text(skill,
+                                            style: GoogleFonts.raleway(
+                                                fontSize: width * 0.035,
+                                                color: collaborateAppBarBgColor,
+                                                fontWeight: FontWeight.w400)),
+                                        backgroundColor: Colors.grey[300],
+                                      );
+                                    }).toList(),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
                         )
-                      ],
-                    ),
-                  ),
+                      : Container(),
                   SizedBox(
                     height: height * 0.03,
                   ),
@@ -306,11 +326,22 @@ class GroupDetailScreen extends StatelessWidget {
                                 backgroundColor: Colors.red),
                             onPressed: () async {
                               // Delete the group and navigate to home screen
-                              await FireStoreMethods().deleteGroup(groupId);
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const HomePage()),
-                              );
+                              String res =
+                                  await FireStoreMethods().deleteGroup(groupId);
+                              if (res == '') {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomePage()),
+                                );
+                              } else {
+                                SnackBar(
+                                  content: Text(
+                                    res,
+                                    style: GoogleFonts.raleway(
+                                        fontSize: 18, color: color1),
+                                  ),
+                                );
+                              }
                             },
                             child: Text(
                               'Delete Group',

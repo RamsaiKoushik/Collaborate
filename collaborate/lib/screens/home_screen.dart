@@ -1,7 +1,6 @@
 import 'package:collaborate/models/user.dart';
-import 'package:collaborate/resources/auth_methods.dart';
-import 'package:collaborate/resources/filter_parameters.dart';
-import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
+import 'package:collaborate/backend/filter_parameters.dart';
 import 'package:collaborate/screens/display_users.dart';
 import 'package:collaborate/screens/groups/group_creation_screen.dart';
 import 'package:collaborate/screens/notifications.dart';
@@ -36,39 +35,11 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: collaborateAppBarBgColor,
-        title: Row(
-          children: [
-            DropdownButton<String>(
-              value: selectedFeature,
-              underline: Container(),
-              dropdownColor: color2,
-              borderRadius: BorderRadius.circular(10.0),
-              focusColor: color2,
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    selectedFeature = newValue;
-                  });
-                }
-              },
-              items: <String>['Collaborate', 'Feature 2', 'Feature 3']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: GoogleFonts.raleway(
-                        color: value == selectedFeature ? color4 : Colors.black,
-                        fontWeight: value == selectedFeature
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        fontSize: 24),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+        title: Text('Collaborate',
+            style: GoogleFonts.raleway(
+                color: color4,
+                fontWeight: FontWeight.bold,
+                fontSize: width * 0.07)),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -94,8 +65,6 @@ class _HomePageState extends State<HomePage> {
                   currentUserDomains: userSkillinStrings,
                 ),
               ));
-              // showSearch(context: context, delegate: CustomDelegate());
-              // Handle notification icon click
             },
           ),
           IconButton(
@@ -107,8 +76,6 @@ class _HomePageState extends State<HomePage> {
                       ProfileScreen(uid: AuthMethods().getUserId()),
                 ),
               );
-              // ProfileScreen(uid: AuthMethods().getUserId());
-              // Handle profile icon click
             },
           ),
         ],

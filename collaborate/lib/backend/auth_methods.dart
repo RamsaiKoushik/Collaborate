@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:collaborate/models/user.dart' as model;
-import 'package:collaborate/resources/storage_methods.dart';
+import 'package:collaborate/backend/storage_methods.dart';
 
 class AuthMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -13,7 +13,6 @@ class AuthMethods {
     return currentUser.uid;
   }
 
-  // get user details
   Future<model.User> getUserDetails() async {
     User currentUser = _auth.currentUser!;
 
@@ -22,8 +21,6 @@ class AuthMethods {
 
     return model.User.fromSnap(documentSnapshot);
   }
-
-  // Signing Up User
 
   Future<String> signUpUser(
       {required String email,

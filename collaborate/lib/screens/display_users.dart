@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/screens/user/user_info.dart';
 import 'package:collaborate/utils/color_utils.dart';
-import 'package:collaborate/widgets/user_tile.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -57,7 +55,7 @@ class _UserListingPgeState extends State<UserListingPge> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    // final height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           iconTheme: const IconThemeData(color: collaborateAppBarBgColor),

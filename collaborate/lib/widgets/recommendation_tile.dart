@@ -1,10 +1,9 @@
 import 'package:collaborate/models/group.dart';
-import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
 import 'package:collaborate/screens/groups/group_detail_info.dart';
 import 'package:collaborate/screens/user/user_info.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/send_join.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // Replace with your Group model
 

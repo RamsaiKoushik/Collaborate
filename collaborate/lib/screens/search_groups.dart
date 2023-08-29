@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
 import 'package:collaborate/widgets/group_tile.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +96,7 @@ class _SearchGroupState extends State<SearchGroup> {
                             .toLowerCase()
                             .contains(searchTerm.toLowerCase());
 
-                    return searchMatches;
+                    return searchMatches && !group['isHidden'];
                   }).toList();
 
                   return ListView.builder(

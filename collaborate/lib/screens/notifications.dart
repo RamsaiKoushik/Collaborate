@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/models/group.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/join_request_tile.dart';
 import 'package:collaborate/widgets/recommendation_tile.dart';
-import 'package:collaborate/widgets/send_join.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -76,6 +76,7 @@ class NotificationsScreen extends StatelessWidget {
                   bool rec;
                   rec = hasCommonItem(group.domains, currentUserDomains);
                   rec = rec && !group.groupMembers.contains(currentUserId);
+
                   return rec;
                 } else if (type == 'join_request') {
                   String gCid = notification['group_cid'];
@@ -97,7 +98,28 @@ class NotificationsScreen extends StatelessWidget {
                   if (group == null) return Container();
 
                   if (type == 'recommendation') {
-                    return RecommendedGroupTile(group: group);
+                    FutureBuilder<Map<String, dynamic>?>(
+                      future: FireStoreMethods().getUserDetails(group.uid),
+                      builder: (context, userSnapshot) {
+                        if (userSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+
+                        if (userSnapshot.hasError) {
+                          return const Text('Error loading user data');
+                        }
+
+                        Map<String, dynamic>? userData = userSnapshot.data;
+                        if (userData == null ||
+                            !userData['followers'].contains(currentUserId)) {
+                          return Container();
+                        }
+                        return RecommendedGroupTile(
+                          group: group,
+                        );
+                      },
+                    );
                   } else if (type == 'join_request') {
                     return JoinRequestTile(
                         userId: notification['userId'],
@@ -107,6 +129,7 @@ class NotificationsScreen extends StatelessWidget {
                   } else {
                     return Container();
                   }
+                  return null;
                 },
               );
             },

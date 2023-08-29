@@ -160,7 +160,7 @@
 //   }
 // }
 
-import 'package:collaborate/resources/firestore_methods.dart';
+import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/screens/groups/group_detail_info.dart';
 import 'package:collaborate/screens/user/user_info.dart';
 import 'package:collaborate/utils/color_utils.dart';

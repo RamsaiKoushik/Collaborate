@@ -30,7 +30,8 @@ class GroupTile extends StatelessWidget {
     return Container(
       decoration:
           BoxDecoration(borderRadius: BorderRadius.circular(20), color: color3),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: EdgeInsets.symmetric(
+          horizontal: width * 0.04, vertical: height * 0.015),
       child: Row(
         children: [
           Expanded(
@@ -43,12 +44,14 @@ class GroupTile extends StatelessWidget {
                     backgroundColor: color1,
                   ),
                   SizedBox(width: width * 0.05),
-                  Text(
-                    groupName,
-                    style: GoogleFonts.raleway(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 28,
-                        color: collaborateAppBarBgColor),
+                  Flexible(
+                    child: Text(
+                      groupName,
+                      style: GoogleFonts.raleway(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 28,
+                          color: collaborateAppBarBgColor),
+                    ),
                   )
                 ],
               ),

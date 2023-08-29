@@ -2,9 +2,8 @@ import 'package:collaborate/screens/home_screen.dart';
 import 'package:collaborate/screens/auth/reset_password.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
 import 'package:collaborate/screens/auth/signup_screen.dart';
-import 'package:collaborate/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool isObscured = true;
 
   @override
   void dispose() {
@@ -46,9 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
-      if (context.mounted) {
-        showSnackBar(context, res);
-      }
+      if (context.mounted) {}
     }
   }
 
@@ -88,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.email_outlined,
-                    color: Colors.white70,
+                    color: color4,
                   ),
                   labelText: 'Enter your email',
                   labelStyle: GoogleFonts.ptSans(color: color4),
@@ -107,19 +105,28 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: isObscured,
                 enableSuggestions: false,
                 autocorrect: false,
                 cursorColor: Colors.white,
-                style: GoogleFonts.ptSans(color: Colors.white.withOpacity(0.9)),
+                style: GoogleFonts.ptSans(color: color4),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(
                     Icons.lock_outline,
-                    color: Colors.white70,
+                    color: color4,
                   ),
+                  suffixIcon: IconButton(
+                      icon: Icon(
+                        isObscured ? Icons.visibility_off : Icons.visibility,
+                        color: color4,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isObscured = !isObscured;
+                        });
+                      }),
                   labelText: 'Enter your password',
-                  labelStyle:
-                      GoogleFonts.ptSans(color: Colors.white.withOpacity(0.9)),
+                  labelStyle: GoogleFonts.ptSans(color: color4),
                   filled: true,
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   fillColor: Colors.white.withOpacity(0.3),

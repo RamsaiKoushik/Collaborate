@@ -1,4 +1,3 @@
-import 'package:collaborate/resources/firestore_methods.dart';
 import 'package:collaborate/screens/user/user_info.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';

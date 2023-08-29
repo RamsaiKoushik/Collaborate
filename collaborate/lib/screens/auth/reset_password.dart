@@ -1,7 +1,7 @@
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:collaborate/resources/auth_methods.dart';
+import 'package:collaborate/backend/auth_methods.dart';
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                     Text('Collaborate',
                         style: GoogleFonts.raleway(
-                          fontSize: width * 0.14,
+                          fontSize: width * 0.12,
                           color: collaborateAppBarTextColor,
                           fontWeight: FontWeight.w500,
                         )),
@@ -43,11 +43,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                       controller: _emailTextController,
                       autocorrect: true,
                       cursorColor: color4,
-                      style: TextStyle(color: Colors.white.withOpacity(0.9)),
+                      style: TextStyle(color: color4),
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
                           Icons.email_outlined,
-                          color: Colors.white70,
+                          color: color4,
                         ),
                         labelText: 'Your email',
                         labelStyle: const TextStyle(color: color4),
