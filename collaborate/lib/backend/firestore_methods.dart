@@ -111,8 +111,30 @@ class FireStoreMethods {
   }
 
 // Function to reject a join request
-  Future<void> onReject(String notificationId) async {
+  Future<void> onReject(
+      String notificationId, String userId, String groupId) async {
     // Delete the notification document from the collection
+    await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
+
+    String newNotificationId = const Uuid().v1();
+    print('in fire create');
+
+    await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(newNotificationId)
+        .set({
+      'type': 'rejected_request',
+      'userId': userId,
+      'groupId': groupId,
+      'notificationId': newNotificationId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteNotification(String notificationId) async {
     await FirebaseFirestore.instance
         .collection('notifications')
         .doc(notificationId)

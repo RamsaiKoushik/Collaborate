@@ -4,6 +4,7 @@ import 'package:collaborate/models/group.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/join_request_tile.dart';
 import 'package:collaborate/widgets/recommendation_tile.dart';
+import 'package:collaborate/widgets/rejected_request_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -82,6 +83,8 @@ class NotificationsScreen extends StatelessWidget {
                   String gCid = notification['group_cid'];
 
                   return currentUserId == gCid;
+                } else if (type == 'rejected_request') {
+                  return currentUserId == notification['userId'];
                 } else {
                   return false;
                 }
@@ -133,10 +136,14 @@ class NotificationsScreen extends StatelessWidget {
                         groupId: group.groupId,
                         notificationId: filteredNotifications[index]
                             ['notificationId']);
+                  } else if (type == 'rejected_request') {
+                    print('entered reject mode');
+                    return RejectedRequestTile(
+                        groupId: groupId,
+                        notificationId: notification['notificationId']);
                   } else {
                     return Container();
                   }
-                  return null;
                 },
               );
             },
