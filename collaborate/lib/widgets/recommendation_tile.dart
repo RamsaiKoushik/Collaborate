@@ -6,7 +6,7 @@ import 'package:collaborate/screens/user/user_info.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:collaborate/widgets/send_join.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Replace with your Group model
+import 'package:google_fonts/google_fonts.dart';
 
 class RecommendedGroupTile extends StatelessWidget {
   final Group group; // Group details for the recommended group
@@ -24,8 +24,7 @@ class RecommendedGroupTile extends StatelessWidget {
         child: ListTile(
             leading: CircleAvatar(
               backgroundImage: NetworkImage(group.profilePic),
-              backgroundColor:
-                  collaborateAppBarBgColor, // Replace with image URL
+              backgroundColor: collaborateAppBarBgColor,
             ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,6 +112,7 @@ class RecommendedGroupTile extends StatelessWidget {
                             AuthMethods().getUserId());
                       },
                       child: Text(
+                        //when user clicks it, join request will be sent to the group creator
                         'Join',
                         style: GoogleFonts.raleway(
                           color: color4,

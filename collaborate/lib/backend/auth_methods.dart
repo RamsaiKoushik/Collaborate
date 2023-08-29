@@ -22,6 +22,7 @@ class AuthMethods {
     return model.User.fromSnap(documentSnapshot);
   }
 
+  //signup the user
   Future<String> signUpUser(
       {required String email,
       required String password,
@@ -38,7 +39,6 @@ class AuthMethods {
           username.isNotEmpty ||
           about.isNotEmpty ||
           rollNumber.isNotEmpty) {
-        // registering user in auth with email and password
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
@@ -46,8 +46,12 @@ class AuthMethods {
 
         cred.user!.updateDisplayName(username);
 
-        String profilePic = await StorageMethods()
-            .uploadImageToStorage('profilePics', file, false, false, "");
+        String profilePic = await StorageMethods().uploadImageToStorage(
+            'profilePics',
+            file,
+            false,
+            false,
+            ""); //storing the profile pic in firebase storage
 
         model.User user = model.User(
             username: username,
@@ -61,7 +65,6 @@ class AuthMethods {
             learnSkills: learnSkills,
             experienceSkills: experienceSkills);
 
-        // adding user in our database
         await _firestore
             .collection("users")
             .doc(cred.user!.uid)
@@ -85,7 +88,6 @@ class AuthMethods {
     String res = "Some error Occurred";
     try {
       if (email.isNotEmpty || password.isNotEmpty) {
-        // logging in user with email and password
         await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,

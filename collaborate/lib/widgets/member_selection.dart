@@ -2,15 +2,14 @@ import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+//this shows a dialog box with list of users, search on users is implemented
 class MemberSelectionDialog extends StatefulWidget {
   Map<String, String> availableMembers;
   Map<String, String> displayMembers;
 
   // ignore: use_key_in_widget_constructors
   MemberSelectionDialog(
-      {required this.availableMembers, required this.displayMembers
-      // required this.selectedMembers,
-      });
+      {required this.availableMembers, required this.displayMembers});
 
   @override
   _MemberSelectionDialogState createState() => _MemberSelectionDialogState();
@@ -21,7 +20,6 @@ class _MemberSelectionDialogState extends State<MemberSelectionDialog> {
 
   @override
   void initState() {
-    // selectedMembers = List.from(widget.selectedMembers);
     super.initState();
   }
 

@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
   }
 
+  //this function calls the backend function loginUser and performs the login
   void loginUser() async {
     setState(() {
       _isLoading = true;
@@ -46,7 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
-      if (context.mounted) {}
     }
   }
 
@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final height = MediaQuery.of(context).size.height; // Screen height
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Container(
           constraints: BoxConstraints(minHeight: height),

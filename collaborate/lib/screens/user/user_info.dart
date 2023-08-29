@@ -202,6 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: height * 0.05),
                     buildSkills(
                         user['experienceSkills'], 'Domains with Experience.'),
+                    SizedBox(height: height * 0.05),
                     if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
                       Padding(
                         padding: const EdgeInsets.all(8.0),

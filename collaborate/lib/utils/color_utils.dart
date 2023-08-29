@@ -15,3 +15,6 @@ const checkBoxColor = Color.fromRGBO(255, 176, 127, 1);
 const blackColor = Color.fromRGBO(4, 3, 18, 1);
 var textFieldColor = Colors.white.withOpacity(0.3);
 const orange = Color.fromRGBO(249, 148, 23, 1);
+
+
+//these are a list of colors I have used in the app.

@@ -19,9 +19,9 @@ class GroupDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    // Implement the detailed group info screen here
-    // You can use the groupId to fetch and display the info
+
     return StreamBuilder<DocumentSnapshot>(
+      //fetching the group details given the groupId
       stream: FirebaseFirestore.instance
           .collection('groups')
           .doc('collaborate')
@@ -30,7 +30,7 @@ class GroupDetailScreen extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          // Data is loading, you can show a loading indicator
+          // Data is loading
           return const CircularProgressIndicator();
         }
 
@@ -197,10 +197,8 @@ class GroupDetailScreen extends StatelessWidget {
                                           color: color4,
                                           fontWeight: FontWeight.w400)),
                                   Wrap(
-                                    spacing:
-                                        8, // Adjust the spacing between chips
-                                    runSpacing:
-                                        4, // Adjust the spacing between lines
+                                    spacing: 8,
+                                    runSpacing: 4,
                                     children:
                                         group["domains"].map<Widget>((domain) {
                                       return Chip(
@@ -235,10 +233,8 @@ class GroupDetailScreen extends StatelessWidget {
                                           color: color4,
                                           fontWeight: FontWeight.w400)),
                                   Wrap(
-                                    spacing:
-                                        8, // Adjust the spacing between chips
-                                    runSpacing:
-                                        4, // Adjust the spacing between lines
+                                    spacing: 8,
+                                    runSpacing: 4,
                                     children: group["skillsList"]
                                         .map<Widget>((skill) {
                                       return Chip(
@@ -273,8 +269,8 @@ class GroupDetailScreen extends StatelessWidget {
                           height: height * 0.01,
                         ),
                         Wrap(
-                          spacing: width, // Adjust the spacing between chips
-                          runSpacing: 4, // Adjust the spacing between lines
+                          spacing: width,
+                          runSpacing: 4,
                           children: group["groupMembers"].map<Widget>((member) {
                             return Container(
                               child: GestureDetector(
@@ -320,7 +316,7 @@ class GroupDetailScreen extends StatelessWidget {
                       if (group["groupMembers"]
                           .contains(AuthMethods().getUserId()))
                         if (currentUserId ==
-                            group["uid"]) // Creator of the group
+                            group["uid"]) //creator of the group
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red),

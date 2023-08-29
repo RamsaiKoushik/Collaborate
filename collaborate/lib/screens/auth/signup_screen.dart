@@ -47,11 +47,12 @@ class _SignupScreenState extends State<SignupScreen> {
       _isLoading = true;
     });
 
+    //if user didn't select image from gallery, uploading a default profile pic
     _image ??= (await rootBundle.load('assets/defaultProfileIcon.png'))
         .buffer
         .asUint8List();
 
-    // signup user using our authmethodds
+    // signing up the user, by using the AuthMehods class
     String res = await AuthMethods().signUpUser(
         email: _emailController.text,
         password: _passwordController.text,
@@ -77,7 +78,8 @@ class _SignupScreenState extends State<SignupScreen> {
       setState(() {
         _isLoading = false;
       });
-      // show the error
+
+      //displays a snackbar if there is any error signing up the user
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -92,14 +94,15 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  //sets the image to the image selected from gallery
   selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
-    // set state because we need to display the image we selected on the circle avatar
     setState(() {
       _image = im;
     });
   }
 
+  //this shows up a multiselect window which can be used to select the skills(learn) from a set of options
   void _showMultiSelectLearn(items) async {
     final List? results = await showDialog(
       context: context,
@@ -120,6 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  //this has similar funactionality as the above function, but using a different function to set experience skills
   void _showMultiSelectExperience(items) async {
     final List? results = await showDialog(
       context: context,
@@ -146,7 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final height = MediaQuery.of(context).size.height; // Screen height
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Container(
@@ -331,7 +335,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: height * 0.075,
               ),
               Text(
-                'Which areas are you interested to explore?',
+                'Which areas are you interested to explore in?',
                 style: TextStyle(color: color4, fontSize: width * 0.06),
               ),
               Padding(
@@ -339,8 +343,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // use this button to open the multi-select dialog
                       ElevatedButton(
+                          //this button is used to open the multiselect box, from which user can select skills
                           onPressed: () => {
                                 _showMultiSelectLearn([
                                   'Web Dev',
@@ -363,10 +367,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 vertical: 10, horizontal: 10), // Set padding
                             textStyle: const TextStyle(fontSize: 16),
                           ),
-                          child: const Text('choose')
-                          // const Text('Which areas would you like to explore'),
-                          ),
-
+                          child: const Text('choose')),
                       Wrap(
                         children: _learnSkills
                             .map((e) => Padding(
@@ -389,8 +390,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // use this button to open the multi-select dialog
                       ElevatedButton(
+                          //this button is used to open the multiselect box, from which user can select skills
                           onPressed: () => {
                                 _showMultiSelectExperience([
                                   'Web Dev',
@@ -413,10 +414,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 vertical: 10, horizontal: 10), // Set padding
                             textStyle: const TextStyle(fontSize: 16),
                           ),
-                          child: const Text('choose')
-                          // const Text('Which areas would you like to explore'),
-                          ),
-
+                          child: const Text('choose')),
                       Wrap(
                         children: _experienceSkills
                             .map((e) => Padding(

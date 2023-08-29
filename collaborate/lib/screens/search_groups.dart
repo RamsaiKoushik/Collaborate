@@ -5,6 +5,7 @@ import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+//this screen displays all the users, and implements on the fly search filter, based on the search term
 class SearchGroup extends StatefulWidget {
   const SearchGroup({super.key});
 

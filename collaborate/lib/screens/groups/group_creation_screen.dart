@@ -55,17 +55,14 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
   }
 
   selectImage() async {
+    //setting an image to the picked image from gallery
     Uint8List im = await pickImage(ImageSource.gallery);
-    // set state because we need to display the image we selected on the circle avatar
     setState(() {
       _image = im;
     });
   }
 
   void _showMultiSelect(items) async {
-    // a list of selectable items
-    // these items can be hard-coded or dynamically fetched from a database/API
-
     final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -103,7 +100,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
           groupName,
           selectedCategory,
           skillsList,
-          isHidden,
+          isHidden, // user can make the group private(won't visible in search results/screen)
           description,
           _image!,
           user.uid,
@@ -111,9 +108,9 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
           domains,
           groupMembers);
 
-      print("groupId returned by create gorup");
-      print(res);
       String notificationId = const Uuid().v1();
+
+      // when a group is created this notification will be created to recommend some users who might be intrested to join the group
       await FirebaseFirestore.instance
           .collection('notifications')
           .doc(notificationId)
@@ -233,10 +230,6 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                 Container(
                   width: MediaQuery.of(context).size.width * 0.9,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  // decoration: BoxDecoration(
-                  //   color: textFieldColor,
-                  //   borderRadius: BorderRadius.circular(20),
-                  // ),
                   child: DropdownButton<String>(
                     dropdownColor: color2,
                     value: selectedCategory,
@@ -283,7 +276,6 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // use this button to open the multi-select dialog
                         ElevatedButton(
                             onPressed: () {
                               _showMultiSelect([
@@ -305,10 +297,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                                   color: color4,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400),
-                            )
-                            // const Text('Which areas would you like to explore'),
-                            ),
-
+                            )),
                         Wrap(
                           children: domains
                               .map((e) => Padding(
@@ -351,7 +340,9 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                         ),
                       ],
                     ),
-                    for (int i = 0; i < skillsList.length; i++)
+                    for (int i = 0;
+                        i < skillsList.length;
+                        i++) //lisiting all the frameworks used
                       Row(
                         children: [
                           SizedBox(width: width * 0.1),
@@ -363,6 +354,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                                     fontWeight: FontWeight.w400)),
                           ),
                           IconButton(
+                            // giving an option to remove the library.framework
                             icon: const Icon(Icons.delete, color: color4),
                             onPressed: () => removeSkill(i),
                           ),
@@ -434,6 +426,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
                             SizedBox(width: width * 0.1),
                             Expanded(
                               child: FutureBuilder<String>(
+                                //to fecth the username from userID
                                 future: FireStoreMethods()
                                     .getUsernameForUserId(groupMembers[i]),
                                 builder: (context, snapshot) {
@@ -507,6 +500,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
     );
   }
 
+  //removes a member from the group
   void removeMember(int index) {
     setState(() {
       groupMembers.removeAt(index);
@@ -530,6 +524,7 @@ class _GroupCreationScreenState extends State<GroupCreationScreen> {
     return userNames;
   }
 
+  //shows a list of members in a dialog box to add to group
   Future<void> _showMemberSelectionDialog() async {
     Map<String, String> availableMembers = await _fetchUserNamesFromFirestore();
 

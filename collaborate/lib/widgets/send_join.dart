@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
+//this sends(stores in firestore) a notification of join request
 Future<void> applyToGroup(
     String groupId, String groupCid, String userId) async {
   // Check if there's an existing notification with the same userId, groupId, and type

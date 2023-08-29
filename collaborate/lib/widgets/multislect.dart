@@ -13,10 +13,7 @@ class MultiSelect extends StatefulWidget {
 }
 
 class _MultiSelectState extends State<MultiSelect> {
-  // this variable holds the selected items
-  // final List<String> selectedItems = [];
-
-// This function is triggered when a checkbox is checked or unchecked
+  //to manage checkbox
   void _itemChange(String itemValue, bool isSelected) {
     setState(() {
       if (isSelected) {
@@ -27,12 +24,11 @@ class _MultiSelectState extends State<MultiSelect> {
     });
   }
 
-  // this function is called when the Cancel button is pressed
   void _cancel() {
     Navigator.pop(context);
   }
 
-// this function is called when the Submit button is tapped
+  ///this function returns the selected item to the user who called it
   void _submit() {
     Navigator.pop(context, widget.selectedItems);
   }
@@ -46,9 +42,9 @@ class _MultiSelectState extends State<MultiSelect> {
         child: ListBody(
           children: widget.items
               .map((item) => CheckboxListTile(
-                    value: widget.selectedItems.contains(item),
                     title: Text(item, style: const TextStyle(color: color4)),
                     controlAffinity: ListTileControlAffinity.leading,
+                    value: widget.selectedItems.contains(item),
                     onChanged: (isChecked) => _itemChange(item, isChecked!),
                     activeColor: color4,
                     checkColor: collaborateAppBarBgColor,

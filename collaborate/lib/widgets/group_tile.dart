@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../screens/groups/group_detail_info.dart';
 
+//this is a group tile, which is used in teh rendering of all the groups
 class GroupTile extends StatelessWidget {
   final String groupId;
   final String groupName;
@@ -119,19 +120,14 @@ class GroupTile extends StatelessWidget {
                 .doc(groupId)
                 .snapshots(),
             builder: (context, snapshot) {
-              // print("got into it s");
               if (!snapshot.hasData) {
-                // print("no data");
                 return Container();
               }
 
               final group = snapshot.data!.data() as Map<String, dynamic>?;
               if (group == null) {
-                // print("no group");
                 return Container();
               }
-
-              // print("in stream");
 
               final members = group['groupMembers'];
               final isUserMember = members?.contains(currentUserUid) ?? false;
@@ -160,6 +156,8 @@ class GroupTile extends StatelessWidget {
                     SizedBox(
                       height: height * 0.03,
                     ),
+
+                    //before rendering the apply button we check if the user has applied to the group or not
                     StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('notifications')

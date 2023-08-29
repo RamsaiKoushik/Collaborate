@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-// import 'package:collaborate/models/post.dart';
 import 'package:collaborate/backend/storage_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -47,11 +46,12 @@ class FireStoreMethods {
           .collection('groups')
           .doc(groupId)
           .set(group.toJson());
-      // print("inside create group");
-      // print(groupId);
 
+      groupMembers.remove(uid);
+
+      sendInviteNotifications(groupMembers,
+          groupId); //it sends a notification to all the users that they were added to the group
       return groupId;
-      // print("after return");
     } catch (err) {
       res = err.toString();
     }
@@ -101,9 +101,6 @@ class FireStoreMethods {
       'groupMembers': FieldValue.arrayUnion([userId])
     });
 
-    // var group = await getGroupDetails(groupId);
-
-    // Update the notification status to "accepted"
     await FirebaseFirestore.instance
         .collection('notifications')
         .doc(notificationId)
@@ -120,8 +117,8 @@ class FireStoreMethods {
         .delete();
 
     String newNotificationId = const Uuid().v1();
-    print('in fire create');
 
+    // send a notification to the user, that his request was requested
     await FirebaseFirestore.instance
         .collection('notifications')
         .doc(newNotificationId)
@@ -141,8 +138,46 @@ class FireStoreMethods {
         .delete();
   }
 
+  //this function basically is used to get all the new users that were added into an existing group, it will be used in sending notifications to all the new members
+  Future<List> getNewGroupMembers(
+      String groupId, Map<String, dynamic> newData) async {
+    final groupDoc = await _firestore
+        .collection('groups')
+        .doc('collaborate')
+        .collection('groups')
+        .doc(groupId)
+        .get();
+
+    if (!groupDoc.exists) {
+      throw Exception('Group not found');
+    }
+
+    final currentData = groupDoc.data();
+    if (currentData == null) return [];
+
+    final List existingMembers = List.from(currentData['groupMembers']);
+    final List newMembers = List<String>.from(newData['groupMembers']);
+
+    final List membersToAdd = [];
+
+    for (String memberId in newMembers) {
+      if (!existingMembers.contains(memberId)) {
+        membersToAdd.add(memberId);
+      }
+    }
+
+    return membersToAdd;
+  }
+
   Future<void> updateGroupDetails(
       String groupId, Map<String, dynamic> newData) async {
+    List newMembersToAdd = await getNewGroupMembers(groupId, newData);
+
+    if (newMembersToAdd.isNotEmpty) {
+      // in an update, if there were any new members added to the group, they will be notified
+      sendInviteNotifications(newMembersToAdd, groupId);
+    }
+
     await _firestore
         .collection('groups')
         .doc('collaborate')
@@ -164,7 +199,6 @@ class FireStoreMethods {
       });
     } catch (e) {
       SnackBar(content: Text(e.toString()));
-      // print("Error removing user from group: $e");
     }
   }
 
@@ -178,7 +212,6 @@ class FireStoreMethods {
   }
 
   Future<Map<String, dynamic>> getUserDetails(String userId) async {
-    // Replace 'users' with the actual Firestore collection name
     DocumentSnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('users').doc(userId).get();
 
@@ -193,6 +226,7 @@ class FireStoreMethods {
     await _firestore.collection('users').doc(userId).update(newData);
   }
 
+  // this function is used to handle the follow request of a user
   Future<void> followRequest(String uid, String followRequestId) async {
     try {
       Map<String, dynamic>? userDetails = await getUserDetails(uid);
@@ -215,6 +249,7 @@ class FireStoreMethods {
     }
   }
 
+  // this function is used to handle the unfollow request of a user
   Future<void> unFollowRequest(String uid, String unFollowRequestId) async {
     try {
       Map<String, dynamic>? userDetails = await getUserDetails(uid);
@@ -237,13 +272,9 @@ class FireStoreMethods {
     }
   }
 
+  //this function is used to check if a certain notification exists, will be used to check if the user has already applied to the group or not
   Future<bool> checkNotificationExistence(
       String groupId, String currentUserUid, String groupCreatorId) async {
-    print("inside firestore");
-    print(groupId);
-    print(currentUserUid);
-    print(groupCreatorId);
-    // Perform the Firestore query to check if the notification exists
     QuerySnapshot notificationSnapshot = await FirebaseFirestore.instance
         .collection('notifications')
         .where('groupId', isEqualTo: groupId)
@@ -251,22 +282,32 @@ class FireStoreMethods {
         .where('group_cid', isEqualTo: groupCreatorId)
         .get();
 
-    print(notificationSnapshot.size);
-
     return notificationSnapshot.docs.isNotEmpty;
   }
 
-  Future<List<QueryDocumentSnapshot>> fetchNotification(
-    String groupId,
-    String currentUserId,
-    String groupCreatorId,
-  ) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  // sends an invite all the new group members
+  Future<void> sendInviteNotifications(List groupMembers, String gid) async {
+    for (int i = 0; i < groupMembers.length; i++) {
+      await sendInviteNotification(groupMembers[i], gid);
+    }
+  }
+
+  //sends a notification to the user saying he is added to the group
+  Future<void> sendInviteNotification(String userId, String gid) async {
+    print('enterred send in');
+    String notificationId = const Uuid().v1();
+    await FirebaseFirestore.instance
         .collection('notifications')
-        .where('groupId', isEqualTo: groupId)
-        .where('userId', isEqualTo: currentUserId)
-        .where('group_cid', isEqualTo: groupCreatorId)
-        .get();
-    return querySnapshot.docs;
+        .doc(notificationId)
+        .set({
+      'type': 'invite_request',
+      'userId': userId,
+      'groupId': gid,
+      'notificationId': notificationId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 }
+
+
+//by sending a notification, I mean adding to the firestore notifications collection and on the user screen the notifications will be filtered accordingly

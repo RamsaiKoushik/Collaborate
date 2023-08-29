@@ -2,12 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/backend/firestore_methods.dart';
 import 'package:collaborate/models/group.dart';
 import 'package:collaborate/utils/color_utils.dart';
+import 'package:collaborate/widgets/invitation_tile.dart';
 import 'package:collaborate/widgets/join_request_tile.dart';
 import 'package:collaborate/widgets/recommendation_tile.dart';
 import 'package:collaborate/widgets/rejected_request_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// there will be 4 types of nontifications in firestore, we will show notifications which are connected to the user
 class NotificationsScreen extends StatelessWidget {
   final String currentUserId; // Current user's UID
   final List<String> currentUserDomains; // Current user's domains
@@ -54,6 +56,7 @@ class NotificationsScreen extends StatelessWidget {
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('notifications')
+                .orderBy('timestamp', descending: true)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -72,6 +75,7 @@ class NotificationsScreen extends StatelessWidget {
                 Group? group = allGroup[groupId];
 
                 if (type == 'recommendation') {
+                  //for recommendation notification, we check if the current user is a follower of the group creator and the current users any of the domains match with the group domains
                   if (group == null) return false;
 
                   bool rec;
@@ -84,6 +88,8 @@ class NotificationsScreen extends StatelessWidget {
 
                   return currentUserId == gCid;
                 } else if (type == 'rejected_request') {
+                  return currentUserId == notification['userId'];
+                } else if (type == 'invite_request') {
                   return currentUserId == notification['userId'];
                 } else {
                   return false;
@@ -105,20 +111,16 @@ class NotificationsScreen extends StatelessWidget {
                     return FutureBuilder<Map<String, dynamic>>(
                       future: FireStoreMethods().getUserDetails(group.uid),
                       builder: (context, userSnapshot) {
-                        // print('inside future');
                         if (userSnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          // print('inside');
                           return const CircularProgressIndicator();
                         }
 
                         if (userSnapshot.hasError) {
                           return const Text('Error loading user data');
                         }
-                        // print('came inside');
-                        Map<String, dynamic>? userData = userSnapshot.data;
 
-                        // if (userData != null) print(userData['followers']);
+                        Map<String, dynamic>? userData = userSnapshot.data;
 
                         if (userData == null ||
                             !userData['followers'].contains(currentUserId)) {
@@ -137,10 +139,14 @@ class NotificationsScreen extends StatelessWidget {
                         notificationId: filteredNotifications[index]
                             ['notificationId']);
                   } else if (type == 'rejected_request') {
-                    print('entered reject mode');
+                    // print('entered reject mode');
                     return RejectedRequestTile(
                         groupId: groupId,
                         notificationId: notification['notificationId']);
+                  } else if (type == 'invite_request') {
+                    print("entered render");
+                    return InvitationRequest(
+                        groupId, notification['notificationId']);
                   } else {
                     return Container();
                   }

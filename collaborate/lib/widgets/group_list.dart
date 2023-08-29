@@ -1,10 +1,11 @@
-import 'package:collaborate/backend/filter_parameters.dart';
+import 'package:collaborate/filter_parameters.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collaborate/widgets/group_tile.dart';
 
 import '../backend/auth_methods.dart'; // Import the GroupTile widget
 
+// this is a widget which displays all the groups satisfying the filter parameters
 class GroupListingPage extends StatefulWidget {
   final FilterParameters filterParameters;
 
@@ -43,6 +44,7 @@ class _GroupListingPageState extends State<GroupListingPage> {
             .collection('groups')
             .doc('collaborate')
             .collection('groups')
+            .orderBy('dateCreated', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -52,6 +54,7 @@ class _GroupListingPageState extends State<GroupListingPage> {
           }
           final groups = snapshot.data!.docs;
 
+          //groups are filtered according to the filter params, can check from the variable names
           final filteredGroups = groups.where((group) {
             final categoryMatches = _currentFilters.category.isEmpty ||
                 _currentFilters.category.any((element) {

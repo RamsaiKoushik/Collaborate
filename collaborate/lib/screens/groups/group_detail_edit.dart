@@ -33,6 +33,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
   List domains = [];
   bool isPicked = false;
   List groupMembers = [];
+  List addedMembers = [];
 
   TextEditingController groupNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -44,6 +45,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
     fetchGroupDetails();
   }
 
+  // Fetch group details from Firestore
   void fetchGroupDetails() async {
     groupDetails = await _firestoreMethods.getGroupDetails(widget.groupId);
 
@@ -62,6 +64,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
     }
   }
 
+  // Update group details in Firestore
   void updateGroupDetails() async {
     if (isPicked) {
       profilePicUrl = await StorageMethods().uploadImageToStorage(
@@ -87,10 +90,10 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Build your UI here using the fetched group details
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Align(
@@ -113,8 +116,10 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
               minHeight: MediaQuery.of(context).size.height,
             ),
             child: Column(
+              // Main column for arranging content
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Widgets for displaying different UI elements
                 SizedBox(height: height * 0.06),
                 Align(
                   alignment: Alignment.center,
@@ -222,7 +227,6 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // use this button to open the multi-select dialog
                         ElevatedButton(
                             onPressed: () {
                               _showMultiSelect([
@@ -247,17 +251,14 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400),
                               ),
-                            )
-                            // const Text('Which areas would you like to explore'),
-                            ),
-
+                            )),
                         Wrap(
                           children: domains
                               .map((e) => Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: Chip(
                                       label: Text(e),
-                                      backgroundColor: checkBoxColor,
+                                      backgroundColor: color3,
                                     ),
                                   ))
                               .toList(),
@@ -330,7 +331,6 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
                   height: height * 0.06,
                 ),
                 // Description Input
-
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
@@ -441,6 +441,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
     );
   }
 
+  //this function is used to get all the user details, this function will be used in show memberselectionDialog
   Future<Map<String, String>> _fetchUserNamesFromFirestore() async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('users').get();
@@ -455,12 +456,10 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
         userNames[userId] = userName;
       }
     }
-    print(userNames);
-    print('entered the devil');
-
     return userNames;
   }
 
+  //it shows all the users and we can select users to add
   Future<void> _showMemberSelectionDialog() async {
     Map<String, String> availableMembers = await _fetchUserNamesFromFirestore();
 
@@ -481,6 +480,7 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
     }
   }
 
+  // Function to add a skill from the skillsList
   void addSkill() {
     if (skillController.text != '') {
       setState(() {
@@ -497,25 +497,24 @@ class _GroupEditScreenState extends State<GroupEditScreen> {
     });
   }
 
+  // Function to remove a member from the skillsList
   void removeMember(int index) {
     setState(() {
       groupMembers.removeAt(index);
     });
   }
 
+  //select an image from gallery
   selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
-    // set state because we need to display the image we selected on the circle avatar
     setState(() {
       isPicked = true;
       _image = im;
     });
   }
 
+  //it shows all the skills in a dialog box and we can select from that
   void _showMultiSelect(items) async {
-    // a list of selectable items
-    // these items can be hard-coded or dynamically fetched from a database/API
-
     final List? results = await showDialog(
       context: context,
       builder: (BuildContext context) {

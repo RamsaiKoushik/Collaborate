@@ -55,7 +55,6 @@ class _UserListingPgeState extends State<UserListingPge> {
 
   @override
   Widget build(BuildContext context) {
-    // final height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           iconTheme: const IconThemeData(color: collaborateAppBarBgColor),
@@ -90,10 +89,7 @@ class _UserListingPgeState extends State<UserListingPge> {
                           size: 20,
                         ),
                         onPressed: () => {_searchController.clear()},
-                      )
-
-                      // hintStyle: GoogleFonts.raleway(color: color4),
-                      ),
+                      )),
                   onChanged: (value) {
                     setState(() {
                       _searchTerm = value;
@@ -117,6 +113,7 @@ class _UserListingPgeState extends State<UserListingPge> {
 
                     final userList = snapshot.data!.docs;
 
+                    // using the screen/class to list the followers,following, all users. So have to filter according to query
                     final filteredUsers = userList.where((user) {
                       final followers = (widget.title == 'followers' &&
                           widget.filter.contains(user['uid']));
@@ -124,6 +121,7 @@ class _UserListingPgeState extends State<UserListingPge> {
                           widget.filter.contains(user['uid']));
                       final allUsers = (widget.title == 'search');
 
+                      // this is for search filter
                       final userNameMatches = user['username']
                           .toString()
                           .toLowerCase()
@@ -139,6 +137,7 @@ class _UserListingPgeState extends State<UserListingPge> {
                           allUsers && (userNameMatches || rollNumberMatches);
                     }).toList();
 
+                    //just rendering all the users
                     return ListView.builder(
                       itemCount: filteredUsers.length,
                       itemBuilder: (context, index) {

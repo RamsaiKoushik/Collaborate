@@ -5,11 +5,11 @@ import 'package:collaborate/screens/groups/group_detail_info.dart';
 import 'package:collaborate/utils/color_utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Replace with your Group model
+import 'package:google_fonts/google_fonts.dart';
 
 class RejectedRequestTile extends StatelessWidget {
   final String groupId;
-  final String notificationId; // Group details for the recommended group
+  final String notificationId;
 
   RejectedRequestTile({required this.groupId, required this.notificationId});
 
@@ -26,7 +26,7 @@ class RejectedRequestTile extends StatelessWidget {
               .collection('groups')
               .doc('collaborate')
               .collection('groups')
-              .doc(groupId) // Replace with actual user ID
+              .doc(groupId)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -104,6 +104,7 @@ class RejectedRequestTile extends StatelessWidget {
                           ),
                         ),
                         child: Text(
+                          //this will delete the notification from the firestore
                           'Delete',
                           style: GoogleFonts.raleway(color: color4),
                         ),

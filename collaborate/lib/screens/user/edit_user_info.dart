@@ -138,7 +138,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
     final height = MediaQuery.of(context).size.height; // Screen height
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Container(

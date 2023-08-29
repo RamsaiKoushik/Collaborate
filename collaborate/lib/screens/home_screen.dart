@@ -1,6 +1,6 @@
 import 'package:collaborate/models/user.dart';
 import 'package:collaborate/backend/auth_methods.dart';
-import 'package:collaborate/backend/filter_parameters.dart';
+import 'package:collaborate/filter_parameters.dart';
 import 'package:collaborate/screens/display_users.dart';
 import 'package:collaborate/screens/groups/group_creation_screen.dart';
 import 'package:collaborate/screens/notifications.dart';
@@ -103,7 +103,9 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 18,
                           color: color4),
                       tabs: const [
-                        Tab(text: 'My Teams'),
+                        Tab(
+                            text:
+                                'My Teams'), //consisits of all the teams that user is part in
                         Tab(text: 'Search Teams'),
                       ],
                     ),
@@ -150,7 +152,6 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             height: height * 0.08,
                             decoration: const BoxDecoration(
-                                // shape: BoxShape.rectangle,
                                 color: collaborateAppBarBgColor,
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(25),
@@ -233,6 +234,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //when user clicks on filter, he will be given two choices(firstDialog), based on which he wants to filter,the second dialog gives the list of items he can choose to filter
   void _showFirstDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -274,25 +276,6 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.raleway(color: color4),
                 ),
               ),
-              // ElevatedButton(
-              //   style: ElevatedButton.styleFrom(
-              //     textStyle: GoogleFonts.raleway(color: color4),
-              //     backgroundColor: color2,
-              //   ),
-              //   onPressed: () async {
-              //     var user = await FireStoreMethods()
-              //         .getUserDetails(AuthMethods().getUserId());
-              //     setState(() {
-              //       domainFilter = user['']
-              //     });
-              //     Navigator.pop(context);
-              //     // Close first dialog
-              //   },
-              //   child: Text(
-              //     'My Skills(explore)',
-              //     style: GoogleFonts.raleway(color: color4),
-              //   ),
-              // ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(
@@ -315,6 +298,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+//using items based on need
   List<String> items(String options) {
     List<String> list = [];
     switch (options) {

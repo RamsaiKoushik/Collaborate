@@ -16,32 +16,29 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Collaborate',
-      // home: LoginScreen(),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
             if (snapshot.hasData) {
-              return const HomePage();
+              return const HomePage(); //if user already logged in before
             } else if (snapshot.hasError) {
               return Center(
                 child: Text('${snapshot.error}'),
               );
             }
           }
-          // means connection to future hasnt been made yet
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          return const LoginScreen();
+          return const LoginScreen(); //user haasn't logged in yet
         },
       ),
     );
